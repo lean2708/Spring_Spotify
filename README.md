@@ -1,11 +1,13 @@
 # Sring Spotify
 Spring Spotify là một dịch vụ Restful API được phát triển bởi Spring Boot, nhằm cung cấp các chức năng quản lý và phát nhạc tương tự như Spotify.
 ## Tính Năng
-- Quản lý người dùng: Đăng ký (thành công thông báo qua gmail), đăng nhập, quản lý tài khoản
-- Quản lý Playlist: Tạo, sửa, xóa và chia sẻ danh sách phát
-- Quản lý Artist: Tạo, sửa, xóa, lấy thông tin tất cả nghệ sĩ
-- Quản lý Album: Tạo, sửa, xóa, lấy thông tin các Album
-- Tìm kiếm: Tìm kiếm bài hát theo tên, nghệ sĩ, hoặc thể loại
+- Quản lý người dùng: Đăng ký (thành công thông báo qua gmail), đăng nhập, quản lý tài khoản, đăng kí Premium với tích hợp VNPAY(thông báo qua mail)
+- Quản lý Playlist: Tạo(kèm upload avatar), sửa, xóa và chia sẻ danh sách phát
+- Quản lý Artist: Tạo(kèm upload avatar), sửa, xóa, lấy thông tin tất cả nghệ sĩ
+- Quản lý Album: Tạo(kèm upload avatar), sửa, xóa, lấy thông tin các Album
+- Quản lý Song : Tạo(kèm upload avatar, file song), sửa, xóa, lấy thông tin các Song
+- Tìm kiếm: Tìm kiếm theo độ ưu tiên tên artist, playlist, album, song
+- Upload / Download file lên AWS
 ## Công Nghệ Sử Dụng
 - **Công cụ build**: Maven >= 3.9.5
 - **Java**: 17
@@ -24,14 +26,29 @@ spring.datasource.url=jdbc:mysql://localhost:3306/spotify
 spring.datasource.username=<tên người dùng>  
 spring.datasource.password=<mật khẩu>
 ```
-- Sửa đường dẫn path cục bộ tương ứng với vị trí bạn muốn lưu file khi upload và download :
-```java
-anb52.upload-file.base-uri=<đường dẫn>
-```
 - Cấu hình thông tin email khi bạn cần sử dụng email để thông báo :
 ```java
 spring.mail.username=<email>
 spring.mail.password=<mật khẩu ứng dụng cảu email>
+```
+- Cấu hình thông tin AWS :
+```java
+aws.bucket.name= <your-bucket>
+aws.accessKey= <your-access-key>
+aws.secretKey= <your-secret-key>
+spring.profiles.active=${PROFILE:local}
+spring.servlet.multipart.max-file-size= <kích thước max 1 file>
+spring.servlet.multipart.max-request-size= <kích thước max 1 request>
+```
+- Cấu hình thông tin VNPAY :
+```java
+payment.vnPay.url=https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+payment.vnpay.tmnCode= <your-tmn-code>
+payment.vnpay.secretKey= <your-secret-key>
+payment.vnPay.returnUrl= <URL callback>
+payment.vnpay.version= <version VNPAY>
+payment.vnpay.command=pay
+payment.vnpay.orderType=other
 ```
 **3. Hướng Dẫn Sử Dụng Swagger :**
 - Sau khi chạy ứng dụng, bạn có thể truy cập Swagger UI tại:
