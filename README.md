@@ -66,7 +66,7 @@ Swagger UI sẽ hiển thị các API và cho phép thử nghiệm các chức n
 - Nhập token có được sau khi login
 - Nhấn **Authorize** để thực hiện được API yêu cầu xác thực
   
-**4. Thông tin thanh toán VNPAY :**
+**4. Thông tin thanh toán VNPAY (Test) :**
 
 | Ngân hàng             | NCB                      |
 |-----------------------|--------------------------|
