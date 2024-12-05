@@ -17,7 +17,7 @@ public class SongRequest {
     @NotBlank(message = "Name không được để trống")
      String name;
      String description;
-     long duration;
+    double duration;
     long listener;
 
     String album;

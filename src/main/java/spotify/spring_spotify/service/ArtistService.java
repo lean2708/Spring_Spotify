@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.multipart.MultipartFile;
+import org.xml.sax.SAXException;
 import spotify.spring_spotify.dto.basic.AlbumBasic;
 import spotify.spring_spotify.dto.basic.SongBasic;
 import spotify.spring_spotify.dto.request.ArtistRequest;
@@ -44,7 +45,7 @@ public class ArtistService {
     private final ArtistMapper artistMapper;
     private final FileService fileService;
     @PreAuthorize("hasRole('ADMIN')")
-    public ArtistResponse create(ArtistRequest request, MultipartFile multipartFile) throws FileException, IOException {
+    public ArtistResponse create(ArtistRequest request, MultipartFile multipartFile) throws FileException, IOException, SAXException {
        if(artistRepository.existsByName(request.getName())){
            throw new SpotifyException(ErrorCode.ARTIST_EXISTED);
        }
@@ -126,7 +127,7 @@ public class ArtistService {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    public ArtistResponse update(long id, ArtistRequest request, MultipartFile multipartFile) throws FileException, IOException {
+    public ArtistResponse update(long id, ArtistRequest request, MultipartFile multipartFile) throws FileException, IOException, SAXException {
         Artist artistDB = artistRepository.findById(id)
                 .orElseThrow(() -> new SpotifyException(ErrorCode.ARTIST_NOT_EXISTED));
         Artist artist = artistMapper.update(artistDB,request);

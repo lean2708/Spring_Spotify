@@ -2,6 +2,7 @@ package spotify.spring_spotify.controller;
 
 import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
+import org.xml.sax.SAXException;
 import spotify.spring_spotify.dto.basic.ArtistBasic;
 import spotify.spring_spotify.dto.request.ArtistRequest;
 import spotify.spring_spotify.dto.response.*;
@@ -23,7 +24,7 @@ public class ArtistController {
 private final ArtistService artistService;
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<ArtistResponse> create(@Valid @ModelAttribute ArtistRequest request,
-                                              @RequestParam(value = "image", required = false) MultipartFile multipartFile) throws FileException, IOException {
+                                              @RequestParam(value = "image", required = false) MultipartFile multipartFile) throws FileException, IOException, SAXException {
         return ApiResponse.<ArtistResponse>builder()
                 .code(HttpStatus.CREATED.value())
                 .result(artistService.create(request, multipartFile))
@@ -62,7 +63,7 @@ private final ArtistService artistService;
 
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<ArtistResponse> update(@PathVariable long id,@Valid @ModelAttribute ArtistRequest request,
-                                              @RequestParam(value = "image", required = false) MultipartFile multipartFile) throws FileException, IOException {
+                                              @RequestParam(value = "image", required = false) MultipartFile multipartFile) throws FileException, IOException, SAXException {
         return ApiResponse.<ArtistResponse>builder()
                 .code(HttpStatus.OK.value())
                 .result(artistService.update(id, request,multipartFile))

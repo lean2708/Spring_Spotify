@@ -20,7 +20,7 @@ public class SongResponse {
     long id;
     String name;
     String description;
-    long duration;
+    double duration;
     long listener;
     String imageURL;
     String fileSongURL;

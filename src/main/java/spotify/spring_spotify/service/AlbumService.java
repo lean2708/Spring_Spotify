@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.multipart.MultipartFile;
+import org.xml.sax.SAXException;
 import spotify.spring_spotify.dto.basic.ArtistBasic;
 import spotify.spring_spotify.dto.basic.SongBasic;
 import spotify.spring_spotify.dto.request.AlbumRequest;
@@ -99,7 +100,7 @@ public class AlbumService {
        return convertListAlbumResponse(albums);
     }
 
-    public AlbumResponse update(long id, AlbumRequest request, MultipartFile multipartFile) throws FileException, IOException {
+    public AlbumResponse update(long id, AlbumRequest request, MultipartFile multipartFile) throws FileException, IOException, SAXException {
         Album albumDB = albumRepository.findById(id).orElseThrow(() -> new SpotifyException(ErrorCode.ALBUM_NOT_EXISTED));
         Album album = albumMapper.update(albumDB,request);
 

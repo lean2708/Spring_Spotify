@@ -2,10 +2,10 @@ package spotify.spring_spotify.controller;
 
 import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
+import org.xml.sax.SAXException;
 import spotify.spring_spotify.dto.request.SongRequest;
 import spotify.spring_spotify.dto.response.ApiResponse;
 import spotify.spring_spotify.dto.response.PageResponse;
-import spotify.spring_spotify.dto.response.PlaylistResponse;
 import spotify.spring_spotify.dto.response.SongResponse;
 import spotify.spring_spotify.exception.FileException;
 import spotify.spring_spotify.service.SongService;
@@ -27,7 +27,7 @@ public class SongController {
     private ApiResponse<SongResponse> create(@Valid  @ModelAttribute SongRequest songRequest,
              @RequestParam(value = "image", required = false) MultipartFile image,
                                              @RequestParam(value = "fileSong", required = false) MultipartFile fileSong)
-            throws FileException, IOException {
+            throws FileException, IOException, SAXException {
         return ApiResponse.<SongResponse>builder()
                 .code(HttpStatus.CREATED.value())
                 .result(songService.create(songRequest, image, fileSong))
@@ -63,7 +63,7 @@ public class SongController {
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<SongResponse> update(@PathVariable long id,@Valid @ModelAttribute SongRequest request,
                                             @RequestParam(value = "image", required = false) MultipartFile image,
-                                            @RequestParam(value = "fileSong", required = false) MultipartFile fileSong) throws FileException, IOException {
+                                            @RequestParam(value = "fileSong", required = false) MultipartFile fileSong) throws FileException, IOException,  SAXException {
 
         return ApiResponse.<SongResponse>builder()
                 .code(HttpStatus.OK.value())

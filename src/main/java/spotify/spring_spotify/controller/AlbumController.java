@@ -1,19 +1,17 @@
 package spotify.spring_spotify.controller;
 
-import io.swagger.annotations.ApiParam;
 import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
+import org.xml.sax.SAXException;
 import spotify.spring_spotify.dto.request.AlbumRequest;
 import spotify.spring_spotify.dto.response.AlbumResponse;
 import spotify.spring_spotify.dto.response.ApiResponse;
-import spotify.spring_spotify.dto.response.ArtistResponse;
 import spotify.spring_spotify.dto.response.PageResponse;
 import spotify.spring_spotify.exception.FileException;
 import spotify.spring_spotify.service.AlbumService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -27,7 +25,7 @@ private final AlbumService albumService;
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<AlbumResponse> create(@Valid @ModelAttribute AlbumRequest request,
                                              @RequestParam(value = "image", required = false) MultipartFile multipartFile)
-            throws FileException, IOException {
+            throws FileException, IOException, SAXException {
         return ApiResponse.<AlbumResponse>builder()
                 .code(HttpStatus.CREATED.value())
                 .result(albumService.create(request, multipartFile))
@@ -63,7 +61,7 @@ private final AlbumService albumService;
     }
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<AlbumResponse> update(@PathVariable long id,@Valid @ModelAttribute AlbumRequest request,
-                                             @RequestParam(value = "image", required = false) MultipartFile multipartFile) throws FileException, IOException {
+                                             @RequestParam(value = "image", required = false) MultipartFile multipartFile) throws FileException, IOException, SAXException {
         return ApiResponse.<AlbumResponse>builder()
                 .code(HttpStatus.OK.value())
                 .result(albumService.update(id, request, multipartFile))

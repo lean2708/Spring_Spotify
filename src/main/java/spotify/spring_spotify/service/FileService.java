@@ -7,25 +7,19 @@ import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.xml.sax.SAXException;
 import spotify.spring_spotify.dto.response.FileResponse;
 import spotify.spring_spotify.exception.FileException;
-
-import javax.sound.sampled.*;
 import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import javax.sound.sampled.AudioFileFormat;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-
+import com.amazonaws.services.s3.model.S3Object;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -43,7 +37,7 @@ public class FileService {
         boolean isValidFile = isValidFile(multipartFile);
 
         if (!isValidFile || !allowedFileExtensions.contains(FilenameUtils.getExtension(multipartFile.getOriginalFilename()))){
-            throw new FileException("File không hợp lệ. Định dạng file hoặc tên file không được hỗ trợ.");
+            throw new FileException("File " +  multipartFile.getOriginalFilename() + " không hợp lệ. Định dạng file hoặc tên file không được hỗ trợ.");
         }
 
         // convert multipart file  to a file
@@ -51,7 +45,6 @@ public class FileService {
         try (FileOutputStream fileOutputStream = new FileOutputStream(file)){
             fileOutputStream.write(multipartFile.getBytes());
         }
-
 
         // generate file name
         String fileName = generateFileName(multipartFile);
@@ -77,7 +70,7 @@ public class FileService {
 
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('PREMIUM')")
-    public Object downloadFile(String fileName) throws FileException, IOException {
+    public Object downloadFile(String fileName) throws FileException {
         if (bucketIsEmpty()) {
             throw new FileException("Bucket yêu cầu không tồn tại hoặc trống.");
         }
@@ -119,7 +112,7 @@ public class FileService {
             s3Client.deleteObject(bucketName, fileName);
             return true;
         } catch (AmazonS3Exception e) {
-            System.out.println("Error deleting file from S3: " + e.getMessage());
+            System.out.println("Lỗi khi xóa file khỏi S3: " + e.getMessage());
             return false;
         }
     }

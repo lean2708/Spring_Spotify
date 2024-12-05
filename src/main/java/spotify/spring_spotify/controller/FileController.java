@@ -60,7 +60,7 @@ public class FileController {
                     .code(HttpStatus.NOT_FOUND.value())
                     .message("File không tồn tại")
                     .build();
-            return new ResponseEntity<>("File không tồn tại", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(apiResponse, HttpStatus.NOT_FOUND);
         }
     }
 

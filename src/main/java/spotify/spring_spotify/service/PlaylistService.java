@@ -5,6 +5,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.multipart.MultipartFile;
+import org.xml.sax.SAXException;
 import spotify.spring_spotify.dto.basic.SongBasic;
 import spotify.spring_spotify.dto.request.PlaylistRequest;
 import spotify.spring_spotify.dto.response.AlbumResponse;
@@ -38,7 +39,7 @@ public class PlaylistService {
     private final FileService fileService;
     private final AuthService authService;
 
-    public PlaylistResponse create(PlaylistRequest request, MultipartFile multipartFile) throws FileException, IOException {
+    public PlaylistResponse create(PlaylistRequest request, MultipartFile multipartFile) throws FileException, IOException, SAXException {
         if(playlistRepository.existsByTitle(request.getTitle())){
             throw new SpotifyException(ErrorCode.PLAYLIST_EXISTED);
         }
@@ -112,7 +113,7 @@ public class PlaylistService {
     }
 
 
-    public PlaylistResponse update(long id, PlaylistRequest request, MultipartFile multipartFile) throws FileException, IOException {
+    public PlaylistResponse update(long id, PlaylistRequest request, MultipartFile multipartFile) throws FileException, IOException, SAXException {
         Playlist playlistDB = playlistRepository.findById(id)
                 .orElseThrow(() -> new SpotifyException(ErrorCode.PLAYLIST_NOT_EXISTED));
 
