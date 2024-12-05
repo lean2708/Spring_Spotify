@@ -51,7 +51,7 @@ payment.vnpay.command=pay
 payment.vnpay.orderType=other
 ```
 **3. Hướng Dẫn Sử Dụng Swagger :**
-**- Sau khi chạy ứng dụng, bạn có thể truy cập Swagger UI tại:**
+- **Sau khi chạy ứng dụng, bạn có thể truy cập Swagger UI tại:**
 ```java
 http://localhost:8080/spotify/swagger-ui/index.html
 ```
