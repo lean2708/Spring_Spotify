@@ -3,6 +3,7 @@ package spotify.spring_spotify.service;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -11,6 +12,7 @@ import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 import spotify.spring_spotify.entity.User;
 
+import java.io.File;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,6 +37,9 @@ public class EmailService {
             helper.setTo(to);
             helper.setSubject(subject);
             helper.setText(htmlContent, true);
+
+            FileSystemResource res = new FileSystemResource("src/main/resources/static/spotify.png");
+            helper.addInline("spotifyLogo", res);
 
             javaMailSender.send(message);
         }

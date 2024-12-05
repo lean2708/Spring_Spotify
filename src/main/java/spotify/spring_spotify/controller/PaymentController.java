@@ -23,7 +23,7 @@ public class PaymentController {
     private final PaymentService paymentService;
     @GetMapping("/vn-pay")
     public ApiResponse<VNPayResponse> pay(@RequestParam String premiumType, HttpServletRequest request) {
-        return new ApiResponse<>(HttpStatus.OK.value(), "Successfully generated VNPay payment URL",
+        return new ApiResponse<>(HttpStatus.OK.value(), "Tạo thành công URL thanh toán VNPay",
                 paymentService.createVnPayPayment(premiumType, request));
     }
 
@@ -32,11 +32,11 @@ public class PaymentController {
     public ApiResponse<PremiumResponse> payCallbackHandler(HttpServletRequest request) {
         String status = request.getParameter("vnp_ResponseCode");
         if (status.equals("00")) {
-            return new ApiResponse<>(1000, "Payment successful",
+            return new ApiResponse<>(1000, "Thanh toán thành công",
                     paymentService.updatePremium(request));
         } else {
-            log.error("Payment failed with response code: " + status);
-            return new ApiResponse<>(4000, "Payment failed", null);
+            log.error("Thanh toán không thành công với mã phản hồi: " + status);
+            return new ApiResponse<>(4000, "Thanh toán thất bại", null);
         }
     }
 

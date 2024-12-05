@@ -82,7 +82,7 @@ public class PaymentService {
         String paymentUrl = vnPayConfig.getVnp_PayUrl() + "?" + queryUrl;
         return VNPayResponse.builder()
                 .code("ok")
-                .message("success")
+                .message("Mã thanh toán đã được tạo thành công. Bạn sẽ được chuyển đến cổng thanh toán để hoàn tất giao dịch.")
                 .paymentUrl(paymentUrl).build();
     }
 

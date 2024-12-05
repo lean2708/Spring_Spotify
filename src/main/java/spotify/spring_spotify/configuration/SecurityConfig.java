@@ -22,10 +22,11 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final String[] PUBLIC_ENDPOINTS = {"/v1/auth/login", "/v1/auth/register",
+    private final String[] PUBLIC_ENDPOINTS = {"/spotify.png",
+            "/v1/auth/login", "/v1/auth/register",
             "/v1/auth/introspect", "/v1/auth/logout",
             "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html",
-            "v1/payment/vn-pay-callback"
+            "/v1/payment/vn-pay-callback"
     };
     private final CustomJwtDecoder customJwtDecoder;
 
@@ -41,6 +42,7 @@ public class SecurityConfig {
 
         httpSecurity.authorizeHttpRequests(request->
                 request.requestMatchers(PUBLIC_ENDPOINTS).permitAll()
+                        .requestMatchers("/spotify/static/**").permitAll()
                         .anyRequest().authenticated()
         );
 

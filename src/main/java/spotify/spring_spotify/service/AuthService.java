@@ -75,7 +75,10 @@ public class AuthService {
 
         Role userRole = roleRepository.findByName("USER").orElseThrow(
                 () -> new SpotifyException(ErrorCode.ROLE_NOT_EXISTED));
-        Set<Role> roles = user.getRoles();
+        Set<Role> roles = new HashSet<>();
+        if(user.getRoles() != null){
+            roles.addAll(user.getRoles());
+        }
         roles.add(userRole);
         user.setRoles(roles);
 
