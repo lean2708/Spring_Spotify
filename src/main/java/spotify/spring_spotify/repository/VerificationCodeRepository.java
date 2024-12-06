@@ -9,4 +9,5 @@ import java.util.Optional;
 @Repository
 public interface VerificationCodeRepository extends JpaRepository<VerificationCodeEntity, Long> {
     Optional<VerificationCodeEntity> findByEmailAndVerificationCode(String email, String verificationCode);
+    void deleteByExpirationTimeBefore(long expirationTime);
 }

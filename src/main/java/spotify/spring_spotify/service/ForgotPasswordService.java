@@ -1,7 +1,9 @@
 package spotify.spring_spotify.service;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -25,7 +27,6 @@ public class ForgotPasswordService {
     private final UserRepository userRepository;
     private final VerificationCodeRepository verificationCodeRepository;
     private final EmailService emailService;
-    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
 
     public VerificationCodeEntity forgotPassword(ForgotPasswordRequest request){
@@ -36,17 +37,15 @@ public class ForgotPasswordService {
         try {
             emailService.sendVerificationCode(user, verificationCode);
 
-            long expirationTime = System.currentTimeMillis() / 1000 + (5 * 60);
+            long expirationTimeInMinutes = System.currentTimeMillis() / 60000 + (10);
 
             VerificationCodeEntity verificationCodeEntity = VerificationCodeEntity.builder()
-                    .email(user.getEmail().trim())
-                    .verificationCode(verificationCode.trim())
-                    .expirationTime(expirationTime)
+                    .email(user.getEmail())
+                    .verificationCode(verificationCode)
+                    .expirationTime(expirationTimeInMinutes)
                     .build();
 
             verificationCodeRepository.save(verificationCodeEntity);
-
-            scheduler.schedule(() -> deleteVerificationCode(verificationCodeEntity.getId()), 15, TimeUnit.MINUTES);
 
             return verificationCodeEntity;
         } catch (Exception e) {
@@ -59,23 +58,13 @@ public class ForgotPasswordService {
             VerificationCodeEntity verificationCodeEntity = verificationCodeRepository.findByEmailAndVerificationCode(email, verificationCode)
                     .orElseThrow(() -> new SpotifyException(ErrorCode.VERIFICATION_CODE_NOT_FOUND));
 
-            if (verificationCodeEntity.getExpirationTime() < System.currentTimeMillis() / 1000) {
+            if (verificationCodeEntity.getExpirationTime() < System.currentTimeMillis() / 60000) {
                 throw new SpotifyException(ErrorCode.VERIFICATION_CODE_EXPIRED);
             }
 
             return true;
     }
 
-    private String generateVerificationCode() {
-        return String.format("%06d", (int) (Math.random() * 1000000));
-    }
-
-    public void deleteVerificationCode(Long verificationCodeId) {
-        VerificationCodeEntity verificationCodeEntity = verificationCodeRepository.findById(verificationCodeId)
-                .orElseThrow(() -> new SpotifyException(ErrorCode.VERIFICATION_CODE_NOT_FOUND));
-
-        verificationCodeRepository.delete(verificationCodeEntity);
-    }
 
     public void changePassword(ChangePasswordRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
@@ -85,4 +74,17 @@ public class ForgotPasswordService {
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
     }
+
+    private String generateVerificationCode() {
+        return String.format("%06d", (int) (Math.random() * 1000000));
+    }
+
+//    @Scheduled(fixedRate = 3600000)
+    @PostConstruct
+    public void deleteExpiredVerificationCodes() {
+        long currentTimeInMinutes = System.currentTimeMillis() / 60000; // thoi diem hien tai (phut)
+
+        verificationCodeRepository.deleteByExpirationTimeBefore(currentTimeInMinutes);
+    }
+
 }

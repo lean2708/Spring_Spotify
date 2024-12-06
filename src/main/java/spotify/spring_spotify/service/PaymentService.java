@@ -152,7 +152,7 @@ public class PaymentService {
                 .build();
     }
 
-//    @Scheduled(cron = "0 0 12 * * ?")
+//    @Scheduled(fixedRate = 3600000)
     @PostConstruct
     @Async
     public void checkPremiumExpiry() {
