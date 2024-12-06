@@ -16,7 +16,6 @@ public class AlbumRequest {
     String description;
     long follower;
 
-
     Set<String> artists;
 
     Set<String> songs;

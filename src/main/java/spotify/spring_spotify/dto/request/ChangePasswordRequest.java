@@ -16,6 +16,6 @@ public class ChangePasswordRequest {
     @NotBlank(message = "Email không được để trống")
     String email;
     @Size(min = 5, message = "Password phải từ 5 kí tự trở lên")
-    @NotBlank(message = "New Password không được để trống")
+    @NotBlank(message = "Password không được để trống")
     String newPassword;
 }

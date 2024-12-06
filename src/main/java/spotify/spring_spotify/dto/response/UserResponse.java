@@ -22,6 +22,7 @@ public class UserResponse {
      @JsonFormat(pattern = "dd/MM/yyyy")
      LocalDate dob;
      Set<PlaylistBasic> createdPlaylists;
+     @JsonInclude(JsonInclude.Include.NON_NULL)
      List<Long> savedPlaylistId;
 
      @JsonInclude(JsonInclude.Include.NON_NULL)
