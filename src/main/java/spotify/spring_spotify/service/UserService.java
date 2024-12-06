@@ -148,19 +148,6 @@ public class UserService {
         userRepository.delete(userDB);
     }
 
-    public UserResponse convertUserResponse(User user){
-        UserResponse response = userMapper.toUserResponse(user);
-
-        Set<PlaylistBasic> playlistBasicSet = user.getCreatedPlaylists()
-                .stream().map(playlistMapper::toPlaylistBasic).collect(Collectors.toSet());
-        response.setCreatedPlaylists(playlistBasicSet);
-
-        Set<RoleResponse> roleResponses = user.getRoles().stream()
-                .map(roleMapper::toRoleResponse).collect(Collectors.toSet());
-        response.setRoles(roleResponses);
-        return response;
-    }
-
     public PlaylistBasic createSavedPlaylists(long id) {
         Playlist playlist = playlistRepository.findById(id)
                 .orElseThrow(() -> new SpotifyException(ErrorCode.PLAYLIST_NOT_EXISTED));
@@ -178,6 +165,19 @@ public class UserService {
         userRepository.save(user);
 
         return playlistMapper.toPlaylistBasic(playlist);
+    }
+
+    public UserResponse convertUserResponse(User user){
+        UserResponse response = userMapper.toUserResponse(user);
+
+        Set<PlaylistBasic> playlistBasicSet = user.getCreatedPlaylists()
+                .stream().map(playlistMapper::toPlaylistBasic).collect(Collectors.toSet());
+        response.setCreatedPlaylists(playlistBasicSet);
+
+        Set<RoleResponse> roleResponses = user.getRoles().stream()
+                .map(roleMapper::toRoleResponse).collect(Collectors.toSet());
+        response.setRoles(roleResponses);
+        return response;
     }
 
     public List<UserResponse> convertListUserResponse(List<User> userList){

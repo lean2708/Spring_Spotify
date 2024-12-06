@@ -62,7 +62,7 @@ public class UserController {
                 .message("Delete User")
                 .build();
     }
-    @PostMapping("/user/saved-playlists/{id}")
+    @PostMapping("/user/saved-playlist/{idPlaylist}")
     public ApiResponse<PlaylistBasic> createSavedPlaylists(@PathVariable long id){
         return ApiResponse.<PlaylistBasic>builder()
                 .code(HttpStatus.OK.value())
