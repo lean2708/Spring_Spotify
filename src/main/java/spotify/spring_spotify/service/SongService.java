@@ -88,7 +88,7 @@ public class SongService {
         // File song
         if (fileSong != null && !fileSong.isEmpty()) {
             List<String> allowedFileSongExtensions = new ArrayList<>
-                    (Arrays.asList("mp3", "wav", "aac", "flac", "ogg", "avi", "mov", "mkv", "flv", "wmv"));
+                    (Arrays.asList("mp3", "wav", "aac", "flac", "ogg", "avi", "mov", "mkv", "flv", "wmv", "m4a"));
             song.setFileSongURL(fileService.uploadFile(fileSong, allowedFileSongExtensions).getUrl());
         }
 

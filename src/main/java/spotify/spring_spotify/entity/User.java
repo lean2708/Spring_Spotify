@@ -26,6 +26,7 @@ public class User {
      String email;
      @JsonIgnore
      String password;
+    String imageURL;
     @JsonFormat(pattern = "dd/MM/yyyy")
      LocalDate dob;
     @JsonInclude(JsonInclude.Include.NON_NULL)

@@ -19,6 +19,7 @@ public class UserResponse {
      long id;
      String name;
      String email;
+     String imageURL;
      @JsonFormat(pattern = "dd/MM/yyyy")
      LocalDate dob;
      Set<PlaylistBasic> createdPlaylists;

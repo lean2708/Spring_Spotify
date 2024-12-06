@@ -2,6 +2,7 @@ package spotify.spring_spotify.service;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.multipart.MultipartFile;
 import spotify.spring_spotify.dto.basic.PlaylistBasic;
 import spotify.spring_spotify.dto.basic.SongBasic;
 import spotify.spring_spotify.dto.request.UserRequest;
@@ -12,6 +13,7 @@ import spotify.spring_spotify.entity.Playlist;
 import spotify.spring_spotify.entity.Role;
 import spotify.spring_spotify.entity.User;
 import spotify.spring_spotify.exception.ErrorCode;
+import spotify.spring_spotify.exception.FileException;
 import spotify.spring_spotify.exception.SpotifyException;
 import spotify.spring_spotify.mapper.PlaylistMapper;
 import spotify.spring_spotify.mapper.RoleMapper;
@@ -24,10 +26,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.io.IOException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,6 +39,7 @@ public class UserService {
     private final PlaylistMapper playlistMapper;
     private final RoleRepository roleRepository;
     private final RoleMapper roleMapper;
+    private final FileService fileService;
 
     @PreAuthorize("hasRole('ADMIN')")
     public UserResponse create(UserRequest request){
@@ -106,7 +107,7 @@ public class UserService {
         return playlistBasics;
     }
 
-    public UserResponse update(long id, UserRequest request){
+    public UserResponse update(long id, UserRequest request, MultipartFile multipartFile) throws FileException, IOException {
         User userDB = userRepository.findById(id).
                 orElseThrow(() -> new SpotifyException(ErrorCode.USER_NOT_EXISTED));
 
@@ -136,6 +137,12 @@ public class UserService {
         }
         else{
             user.setRoles(new HashSet<>());
+        }
+
+        if (multipartFile != null && !multipartFile.isEmpty()) {
+            List<String> allowedFileExtensions = new ArrayList<>
+                    (Arrays.asList("jpg", "jpeg", "png", "gif", "bmp","svg"));
+            user.setImageURL(fileService.uploadFile(multipartFile, allowedFileExtensions).getUrl());
         }
 
         return convertUserResponse(userRepository.save(user));

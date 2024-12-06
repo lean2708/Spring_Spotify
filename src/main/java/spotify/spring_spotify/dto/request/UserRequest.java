@@ -2,11 +2,14 @@ package spotify.spring_spotify.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.util.Set;
@@ -27,6 +30,7 @@ public class UserRequest {
     String password;
     @Schema(type = "string", pattern = "dd-MM-yyyy", example = "dd/mm/yyyy")
     @JsonFormat(pattern = "dd/MM/yyyy")
+    @DateTimeFormat(pattern = "dd/MM/yyyy")
     LocalDate dob;
     Set<String> createdPlaylists;
     Set<String> roles;

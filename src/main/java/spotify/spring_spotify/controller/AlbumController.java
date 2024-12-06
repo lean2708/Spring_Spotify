@@ -23,6 +23,8 @@ import java.util.List;
 @RequestMapping("/v1")
 public class AlbumController {
 private final AlbumService albumService;
+
+
     @PostMapping(value = "/album",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<AlbumResponse> create(@Valid @ModelAttribute AlbumRequest request,
                                              @RequestParam(value = "image", required = false) MultipartFile multipartFile)
