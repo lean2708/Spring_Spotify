@@ -70,16 +70,19 @@ public class PaymentService {
 
         vnpParamsMap.put("vnp_IpAddr", VNPayUtil.getIpAddress(request));
 
-        // Sap xep
+        // Tao chuoi da ma hoa
         String queryUrl = VNPayUtil.getPaymentURL(vnpParamsMap, true);
 
-        //build query url
+        // Tao chuoi chua ma hoa
         String hashData = VNPayUtil.getPaymentURL(vnpParamsMap, false);
-
         // Thêm vnp_SecureHash vào URL
         String vnpSecureHash = VNPayUtil.hmacSHA512(vnPayConfig.getSecretKey(), hashData);
+
         queryUrl += "&vnp_SecureHash=" + vnpSecureHash;
+
+        // Tao URL Final
         String paymentUrl = vnPayConfig.getVnp_PayUrl() + "?" + queryUrl;
+
         return VNPayResponse.builder()
                 .code("ok")
                 .message("Mã thanh toán đã được tạo thành công. Bạn sẽ được chuyển đến cổng thanh toán để hoàn tất giao dịch.")

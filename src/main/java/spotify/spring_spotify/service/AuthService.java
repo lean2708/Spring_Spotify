@@ -1,31 +1,20 @@
 package spotify.spring_spotify.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.CollectionUtils;
 import spotify.spring_spotify.constant.RoleEnum;
 import spotify.spring_spotify.dto.basic.PlaylistBasic;
-import spotify.spring_spotify.dto.request.AuthRequest;
-import spotify.spring_spotify.dto.request.RegisterRequest;
-import spotify.spring_spotify.dto.request.TokenRequest;
-import spotify.spring_spotify.dto.request.UserRequest;
-import spotify.spring_spotify.dto.response.AuthResponse;
-import spotify.spring_spotify.dto.response.IntrospectResponse;
-import spotify.spring_spotify.dto.response.RoleResponse;
-import spotify.spring_spotify.dto.response.UserResponse;
-import spotify.spring_spotify.entity.InvalidatedToken;
-import spotify.spring_spotify.entity.Playlist;
-import spotify.spring_spotify.entity.Role;
-import spotify.spring_spotify.entity.User;
+import spotify.spring_spotify.dto.request.*;
+import spotify.spring_spotify.dto.response.*;
+import spotify.spring_spotify.entity.*;
 import spotify.spring_spotify.exception.ErrorCode;
 import spotify.spring_spotify.exception.SpotifyException;
 import spotify.spring_spotify.mapper.PlaylistMapper;
 import spotify.spring_spotify.mapper.RoleMapper;
 import spotify.spring_spotify.mapper.UserMapper;
-import spotify.spring_spotify.repository.InvalidatedRepository;
-import spotify.spring_spotify.repository.PlaylistRepository;
-import spotify.spring_spotify.repository.RoleRepository;
-import spotify.spring_spotify.repository.UserRepository;
+import spotify.spring_spotify.repository.*;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
@@ -41,16 +30,17 @@ import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class AuthService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    private final PlaylistRepository playlistRepository;
     private final PlaylistMapper playlistMapper;
     private final EmailService emailService;
     private final RoleRepository roleRepository;
@@ -206,4 +196,5 @@ public class AuthService {
         }
         return response;
     }
+
 }

@@ -53,8 +53,6 @@ public class ApplicationInitConfig {
                         .name("ADMIN")
                         .email(ADMIN_EMAIL)
                         .password(passwordEncoder.encode(ADMIN_PASSWORD))
-                        .language("vietnamese")
-                        .gender("Nam")
                         .roles(roles)
                         .build();
 

@@ -21,8 +21,6 @@ public class UserResponse {
      String email;
      @JsonFormat(pattern = "dd/MM/yyyy")
      LocalDate dob;
-     String gender;
-     String language;
      Set<PlaylistBasic> createdPlaylists;
      List<Long> savedPlaylistId;
 

@@ -30,7 +30,10 @@ public enum ErrorCode {
     ALBUM_EXISTED(1020, "Album đã tồn tại", HttpStatus.BAD_REQUEST),
     ALBUM_NOT_EXISTED(1021, "Album không tồn tại", HttpStatus.NOT_FOUND),
     INVALID_PREMIUM_TYPE(1009, "Invalid premium type", HttpStatus.BAD_REQUEST),
-    INVALID_PASSWORD(1022, "Mật khẩu không chính xác", HttpStatus.UNAUTHORIZED)
+    INVALID_PASSWORD(1022, "Mật khẩu không chính xác", HttpStatus.UNAUTHORIZED),
+    EMAIL_SEND_FAILED(1023, "Lỗi khi gửi email", HttpStatus.BAD_REQUEST),
+    VERIFICATION_CODE_NOT_FOUND(1024, "Mã xác nhận không tồn tại", HttpStatus.NOT_FOUND),
+    VERIFICATION_CODE_EXPIRED(1025, "Mã xác nhận đã hết hạn", HttpStatus.BAD_REQUEST)
     ;
 
     private int code;

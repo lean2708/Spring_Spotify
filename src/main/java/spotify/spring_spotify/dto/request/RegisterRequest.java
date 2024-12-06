@@ -27,6 +27,4 @@ public class RegisterRequest {
     @Schema(type = "string", pattern = "dd-MM-yyyy", example = "dd/mm/yyyy")
     @JsonFormat(pattern = "dd/MM/yyyy")
     LocalDate dob;
-    String language;
-    String gender;
 }

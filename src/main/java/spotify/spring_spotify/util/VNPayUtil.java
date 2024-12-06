@@ -61,10 +61,8 @@ public class VNPayUtil {
                 .sorted(Map.Entry.comparingByKey())
                 .map(entry ->
                         (encodeKey ? URLEncoder.encode(entry.getKey(),
-                                StandardCharsets.US_ASCII)
-                                : entry.getKey()) + "=" +
-                                URLEncoder.encode(entry.getValue()
-                                , StandardCharsets.US_ASCII))
+                                StandardCharsets.US_ASCII) : entry.getKey())
+                                + "=" + URLEncoder.encode(entry.getValue(), StandardCharsets.US_ASCII)) // luon ma hoa value
                 .collect(Collectors.joining("&"));
     }
 }

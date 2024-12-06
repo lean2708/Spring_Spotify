@@ -28,8 +28,6 @@ public class User {
      String password;
     @JsonFormat(pattern = "dd/MM/yyyy")
      LocalDate dob;
-     String gender;
-     String language;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDate createdAt;

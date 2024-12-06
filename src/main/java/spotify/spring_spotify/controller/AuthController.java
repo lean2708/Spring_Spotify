@@ -1,20 +1,18 @@
 package spotify.spring_spotify.controller;
 
 import org.springframework.web.bind.annotation.*;
-import spotify.spring_spotify.dto.request.AuthRequest;
-import spotify.spring_spotify.dto.request.RegisterRequest;
-import spotify.spring_spotify.dto.request.TokenRequest;
-import spotify.spring_spotify.dto.request.UserRequest;
+import spotify.spring_spotify.dto.request.*;
 import spotify.spring_spotify.dto.response.ApiResponse;
 import spotify.spring_spotify.dto.response.AuthResponse;
 import spotify.spring_spotify.dto.response.IntrospectResponse;
 import spotify.spring_spotify.dto.response.UserResponse;
+import spotify.spring_spotify.entity.VerificationCodeEntity;
 import spotify.spring_spotify.service.AuthService;
 import com.nimbusds.jose.JOSEException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import spotify.spring_spotify.service.ForgotPasswordService;
 
 import java.text.ParseException;
 
@@ -23,6 +21,7 @@ import java.text.ParseException;
 @RequestMapping("/v1/auth")
 public class AuthController {
     private final AuthService authService;
+    private final ForgotPasswordService forgotPasswordService;
     @PostMapping("/login")
     public ApiResponse<AuthResponse> authenticate(@Valid @RequestBody AuthRequest request) throws JOSEException {
         return ApiResponse.<AuthResponse>builder()
@@ -65,5 +64,38 @@ public class AuthController {
                 .message("Logout")
                 .build();
     }
+    @PostMapping("/forgot-password")
+    public ApiResponse<VerificationCodeEntity> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+        return ApiResponse.<VerificationCodeEntity>builder()
+                .code(HttpStatus.OK.value())
+                .result(forgotPasswordService.forgotPassword(request))
+                .message("Mã xác nhận đã được gửi vào email của bạn.")
+                .build();
+    }
 
+    @PostMapping("/verify-code")
+    public ApiResponse<Void> verifyCode(@RequestBody VerifyCodeRequest request) {
+        boolean isValid = forgotPasswordService.verifyCode(request.getEmail(), request.getVerificationCode());
+        if (isValid) {
+            return ApiResponse.<Void>builder()
+                    .code(HttpStatus.OK.value())
+                    .message("Mã xác nhận hợp lệ")
+                    .build();
+        } else {
+            return ApiResponse.<Void>builder()
+                    .code(HttpStatus.BAD_REQUEST.value())
+                    .message("Mã xác nhận không hợp lệ")
+                    .build();
+        }
+    }
+
+    @PostMapping("/change-password")
+    public ApiResponse<Void> changePassword(@RequestBody ChangePasswordRequest request) {
+        forgotPasswordService.changePassword(request);
+
+        return ApiResponse.<Void>builder()
+                .code(HttpStatus.OK.value())
+                .message("Mật khẩu đã được thay đổi thành công")
+                .build();
+    }
 }

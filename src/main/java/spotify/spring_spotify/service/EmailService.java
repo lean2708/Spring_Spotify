@@ -76,4 +76,22 @@ public class EmailService {
             );
         }
     }
+
+    @Async
+    public void sendVerificationCode(User user, String verificationCode) {
+        if (user != null && verificationCode != null) {
+
+            Map<String, Object> model = new HashMap<>();
+            model.put("name", user.getName());
+            model.put("verificationCode", verificationCode);
+            model.put("expirationTime", "10 phút");
+
+            this.sendEmail(user.getEmail(),
+                    "Mã xác nhận của bạn để khôi phục mật khẩu",
+                    model,
+                    "verification"
+            );
+        }
+    }
+
 }
