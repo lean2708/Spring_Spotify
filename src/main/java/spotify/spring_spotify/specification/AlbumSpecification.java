@@ -21,7 +21,9 @@ public class AlbumSpecification {
 
             Predicate containsKeyword = criteriaBuilder.greaterThan(position, 0);
 
-            query.orderBy(criteriaBuilder.asc(position));
+            query.orderBy(criteriaBuilder.asc(position),
+                    criteriaBuilder.desc(root.get("follower")) );
+
 
             return criteriaBuilder.and(containsKeyword);
         };

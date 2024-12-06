@@ -46,7 +46,7 @@ public class ForgotPasswordService {
 
             verificationCodeRepository.save(verificationCodeEntity);
 
-            scheduler.schedule(() -> deleteVerificationCode(verificationCodeEntity.getId()), 10, TimeUnit.MINUTES);
+            scheduler.schedule(() -> deleteVerificationCode(verificationCodeEntity.getId()), 15, TimeUnit.MINUTES);
 
             return verificationCodeEntity;
         } catch (Exception e) {

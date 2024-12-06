@@ -21,7 +21,8 @@ public class SongSpecification {
 
             Predicate containsKeyword = criteriaBuilder.greaterThan(position, 0);
 
-            query.orderBy(criteriaBuilder.asc(position));
+            query.orderBy(criteriaBuilder.asc(position),
+                    criteriaBuilder.desc(root.get("listener")));
 
             return criteriaBuilder.and(containsKeyword);
         };
