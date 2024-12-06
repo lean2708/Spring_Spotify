@@ -65,7 +65,7 @@ public class AuthController {
                 .build();
     }
     @PostMapping("/forgot-password")
-    public ApiResponse<VerificationCodeEntity> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+    public ApiResponse<VerificationCodeEntity> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
         return ApiResponse.<VerificationCodeEntity>builder()
                 .code(HttpStatus.OK.value())
                 .result(forgotPasswordService.forgotPassword(request))
@@ -74,7 +74,7 @@ public class AuthController {
     }
 
     @PostMapping("/verify-code")
-    public ApiResponse<Void> verifyCode(@RequestBody VerifyCodeRequest request) {
+    public ApiResponse<Void> verifyCode(@Valid @RequestBody VerifyCodeRequest request) {
         boolean isValid = forgotPasswordService.verifyCode(request.getEmail(), request.getVerificationCode());
         if (isValid) {
             return ApiResponse.<Void>builder()
@@ -90,7 +90,7 @@ public class AuthController {
     }
 
     @PostMapping("/change-password")
-    public ApiResponse<Void> changePassword(@RequestBody ChangePasswordRequest request) {
+    public ApiResponse<Void> changePassword(@Valid @RequestBody ChangePasswordRequest request) {
         forgotPasswordService.changePassword(request);
 
         return ApiResponse.<Void>builder()

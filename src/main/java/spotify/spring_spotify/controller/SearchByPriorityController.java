@@ -1,5 +1,6 @@
 package spotify.spring_spotify.controller;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +22,7 @@ import java.util.List;
 public class SearchByPriorityController {
     private final SearchByPriorityService searchByPriorityService;
     @GetMapping()
-    public ApiResponse<PageResponse<SearchResponse>> searchByPriority(@RequestParam String name,
+    public ApiResponse<PageResponse<SearchResponse>> searchByPriority(@RequestParam @NotBlank String name,
                                                                          @RequestParam int pageNo,
                                                                          @RequestParam int pageSize) {
         return ApiResponse.<PageResponse<SearchResponse>>builder()

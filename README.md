@@ -2,10 +2,10 @@
 Spring Spotify là một dịch vụ Restful API được phát triển bởi Spring Boot, nhằm cung cấp các chức năng quản lý và phát nhạc tương tự như Spotify.
 ## Tính Năng
 - Quản lý người dùng: Đăng ký (thành công thông báo qua gmail), đăng nhập, quên mật khẩu(xác thực bằng mã xác nhận qua gmail), quản lý tài khoản, đăng kí Premium với tích hợp VNPAY(thông báo qua mail)
-- Quản lý Playlist: Tạo(kèm upload avatar), sửa, xóa và chia sẻ danh sách phát
-- Quản lý Artist: Tạo(kèm upload avatar), sửa, xóa, lấy thông tin tất cả nghệ sĩ
-- Quản lý Album: Tạo(kèm upload avatar), sửa, xóa, lấy thông tin các Album
-- Quản lý Song : Tạo(kèm upload avatar, file song), sửa, xóa, lấy thông tin các Song
+- Quản lý Playlist: Tạo (kèm upload avatar), sửa, xóa danh sách phát
+- Quản lý Artist: Tạo (kèm upload avatar), sửa, xóa, lấy thông tin tất cả nghệ sĩ
+- Quản lý Album: Tạo (kèm upload avatar), sửa, xóa, lấy thông tin các Album
+- Quản lý Song : Tạo (kèm upload avatar, file song), sửa, xóa, lấy thông tin các Song
 - Tìm kiếm: Tìm kiếm theo độ ưu tiên tên artist, playlist, album, song
 - Upload / Download file lên AWS
 ## Công Nghệ Sử Dụng
@@ -29,7 +29,7 @@ spring.datasource.password=<mật khẩu>
 - Cấu hình thông tin email khi bạn cần sử dụng email để thông báo :
 ```java
 spring.mail.username=<email>
-spring.mail.password=<mật khẩu ứng dụng cảu email>
+spring.mail.password=<mật khẩu ứng dụng của email>
 ```
 - Cấu hình thông tin AWS :
 ```java

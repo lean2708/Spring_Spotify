@@ -21,8 +21,10 @@ public class RegisterRequest {
     @NotBlank(message = "Name không được để trống")
     String name;
     @Email(message = "Email phải có định dạng hợp lệ")
+    @NotBlank(message = "Email không được để trống")
     String email;
     @Size(min = 5, message = "Password phải từ 5 kí tự trở lên")
+    @NotBlank(message = "Password không được để trống")
     String password;
     @Schema(type = "string", pattern = "dd-MM-yyyy", example = "dd/mm/yyyy")
     @JsonFormat(pattern = "dd/MM/yyyy")

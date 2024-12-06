@@ -2,6 +2,7 @@ package spotify.spring_spotify.controller;
 
 import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -22,7 +23,7 @@ import spotify.spring_spotify.service.PaymentService;
 public class PaymentController {
     private final PaymentService paymentService;
     @GetMapping("/vn-pay")
-    public ApiResponse<VNPayResponse> pay(@RequestParam String premiumType, HttpServletRequest request) {
+    public ApiResponse<VNPayResponse> pay(@RequestParam @NotBlank String premiumType, HttpServletRequest request) {
         return new ApiResponse<>(HttpStatus.OK.value(), "Tạo thành công URL thanh toán VNPay",
                 paymentService.createVnPayPayment(premiumType, request));
     }

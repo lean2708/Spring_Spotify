@@ -33,7 +33,7 @@ public class FileController {
 
 
     @GetMapping("/download")
-    public ResponseEntity<?> downloadFile(@RequestParam("fileName")  @NotBlank @NotNull String fileName) throws IOException, FileException {
+    public ResponseEntity<?> downloadFile(@RequestParam("fileName") @NotBlank @NotNull String fileName) throws IOException, FileException {
         Object response = fileService.downloadFile(fileName);
         if (response != null){
             return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"").body(response);

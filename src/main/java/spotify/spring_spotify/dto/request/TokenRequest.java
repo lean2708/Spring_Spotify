@@ -11,5 +11,5 @@ import lombok.experimental.FieldDefaults;
 @Builder
 public class TokenRequest {
     @NotBlank(message = "Token không được để trống")
-    private String token;
+    String token;
 }

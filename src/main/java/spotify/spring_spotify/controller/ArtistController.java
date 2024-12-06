@@ -1,5 +1,6 @@
 package spotify.spring_spotify.controller;
 
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
 import org.xml.sax.SAXException;
@@ -51,7 +52,7 @@ private final ArtistService artistService;
     }
 
     @GetMapping("/search")
-    public ApiResponse<PageResponse<ArtistResponse>> searchArtists(@RequestParam String name,
+    public ApiResponse<PageResponse<ArtistResponse>> searchArtists(@RequestParam @NotBlank String name,
                                                                 @RequestParam(defaultValue = "1") int pageNo,
                                                                 @RequestParam(defaultValue = "3") int pageSize){
         return ApiResponse.<PageResponse<ArtistResponse>>builder()

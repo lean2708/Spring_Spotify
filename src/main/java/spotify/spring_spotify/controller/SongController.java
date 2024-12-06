@@ -1,5 +1,6 @@
 package spotify.spring_spotify.controller;
 
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
 import org.xml.sax.SAXException;
@@ -51,7 +52,7 @@ public class SongController {
                 .build();
     }
     @GetMapping("/search")
-    public ApiResponse<PageResponse<SongResponse>> searchSongs(@RequestParam String name,
+    public ApiResponse<PageResponse<SongResponse>> searchSongs(@RequestParam @NotBlank String name,
                                                                        @RequestParam(defaultValue = "1") int pageNo,
                                                                        @RequestParam(defaultValue = "3") int pageSize){
         return ApiResponse.<PageResponse<SongResponse>>builder()
@@ -61,7 +62,7 @@ public class SongController {
                 .build();
     }
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ApiResponse<SongResponse> update(@PathVariable long id,@Valid @ModelAttribute SongRequest request,
+    public ApiResponse<SongResponse> update(@PathVariable long id, @Valid @ModelAttribute SongRequest request,
                                             @RequestParam(value = "image", required = false) MultipartFile image,
                                             @RequestParam(value = "fileSong", required = false) MultipartFile fileSong) throws FileException, IOException,  SAXException {
 

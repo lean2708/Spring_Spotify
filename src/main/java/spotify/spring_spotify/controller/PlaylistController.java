@@ -1,5 +1,6 @@
 package spotify.spring_spotify.controller;
 
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
 import org.xml.sax.SAXException;
@@ -48,7 +49,7 @@ public class PlaylistController {
                 .build();
     }
     @GetMapping("/search")
-    public ApiResponse<PageResponse<PlaylistResponse>> searchPlaylists(@RequestParam("title") String name,
+    public ApiResponse<PageResponse<PlaylistResponse>> searchPlaylists(@RequestParam("title") @NotBlank String name,
                                                                  @RequestParam(defaultValue = "1") int pageNo,
                                                                  @RequestParam(defaultValue = "3") int pageSize){
         return ApiResponse.<PageResponse<PlaylistResponse>>builder()

@@ -13,7 +13,9 @@ import lombok.experimental.FieldDefaults;
 @Builder
 public class AuthRequest {
     @Email(message = "Email phải có định dạng hợp lệ")
-    private String email;
+    @NotBlank(message = "Email không được để trống")
+    String email;
     @Size(min = 5, message = "Password phải từ 5 kí tự trở lên")
-    private String password;
+    @NotBlank(message = "Password không được để trống")
+    String password;
 }
