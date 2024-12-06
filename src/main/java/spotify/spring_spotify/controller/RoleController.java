@@ -13,11 +13,11 @@ import spotify.spring_spotify.service.RoleService;
 import java.util.List;
 
 @RequiredArgsConstructor
-@RequestMapping("/v1/roles")
+@RequestMapping("/v1")
 @RestController
 public class RoleController {
     private final RoleService roleService;
-    @PostMapping()
+    @PostMapping("/role")
     public ApiResponse<RoleResponse> create(@Valid @RequestBody RoleRequest request){
         return ApiResponse.<RoleResponse>builder()
                 .code(HttpStatus.CREATED.value())
@@ -25,7 +25,7 @@ public class RoleController {
                 .message("Create Role")
                 .build();
     }
-    @GetMapping()
+    @GetMapping("/roles")
     public ApiResponse<List<RoleResponse>> fetchAll(){
         return ApiResponse.<List<RoleResponse>>builder()
                 .code(HttpStatus.OK.value())
@@ -33,7 +33,7 @@ public class RoleController {
                 .message("Fetch All Role")
                 .build();
     }
-    @DeleteMapping("/{name}")
+    @DeleteMapping("/role/{name}")
     public ApiResponse<Void> delete(@PathVariable String name){
         roleService.delete(name);
         return ApiResponse.<Void>builder()

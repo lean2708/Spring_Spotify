@@ -16,11 +16,11 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/v1/users")
+@RequestMapping("/v1")
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
-    @PostMapping("")
+    @PostMapping("/user")
     public ApiResponse<UserResponse> create(@Valid @RequestBody UserRequest request){
         return ApiResponse.<UserResponse>builder()
                 .code(HttpStatus.CREATED.value())
@@ -28,7 +28,7 @@ public class UserController {
                 .message("Create User")
                 .build();
     }
-    @GetMapping("{id}")
+    @GetMapping("/user/{id}")
     public ApiResponse<UserResponse> fetchById(@PathVariable long id){
 
         return ApiResponse.<UserResponse>builder()
@@ -37,7 +37,7 @@ public class UserController {
                 .message("Get User By Id")
                 .build();
     }
-    @GetMapping()
+    @GetMapping("/users")
     public ApiResponse<List<UserResponse>> fetchAll(){
         return ApiResponse.<List<UserResponse>>builder()
                 .code(HttpStatus.OK.value())
@@ -46,7 +46,7 @@ public class UserController {
                 .build();
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/user/{id}")
     public ApiResponse<UserResponse> update(@PathVariable long id,@Valid @RequestBody UserRequest request){
         return ApiResponse.<UserResponse>builder()
                 .code(HttpStatus.OK.value())
@@ -54,7 +54,7 @@ public class UserController {
                 .message("Update User")
                 .build();
     }
-    @DeleteMapping("{id}")
+    @DeleteMapping("/user/{id}")
     public ApiResponse<Void> delete(@PathVariable long id){
         userService.deleteUser(id);
         return ApiResponse.<Void>builder()
@@ -62,7 +62,7 @@ public class UserController {
                 .message("Delete User")
                 .build();
     }
-    @PostMapping("/saved-playlists/{id}")
+    @PostMapping("/user/saved-playlists/{id}")
     public ApiResponse<PlaylistBasic> createSavedPlaylists(@PathVariable long id){
         return ApiResponse.<PlaylistBasic>builder()
                 .code(HttpStatus.OK.value())
@@ -70,7 +70,7 @@ public class UserController {
                 .message("Save Playlist With User")
                 .build();
     }
-    @GetMapping("/saved-playlists")
+    @GetMapping("/user/saved-playlists")
     public ApiResponse<List<PlaylistBasic>> fetchSavedPlaylists(){
         return ApiResponse.<List<PlaylistBasic>>builder()
                 .code(HttpStatus.OK.value())

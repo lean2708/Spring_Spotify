@@ -20,10 +20,10 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/v1/albums")
+@RequestMapping("/v1")
 public class AlbumController {
 private final AlbumService albumService;
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/album",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<AlbumResponse> create(@Valid @ModelAttribute AlbumRequest request,
                                              @RequestParam(value = "image", required = false) MultipartFile multipartFile)
             throws FileException, IOException, SAXException {
@@ -34,7 +34,7 @@ private final AlbumService albumService;
                 .build();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/album/{id}")
     public ApiResponse<AlbumResponse> fetchById(@PathVariable long id){
         return ApiResponse.<AlbumResponse>builder()
                 .code(HttpStatus.OK.value())
@@ -42,7 +42,7 @@ private final AlbumService albumService;
                 .message("Fetch Album By Id")
                 .build();
     }
-    @GetMapping()
+    @GetMapping("/albums")
     public ApiResponse<List<AlbumResponse>> fetchAll(){
         return ApiResponse.<List<AlbumResponse>>builder()
                 .code(HttpStatus.OK.value())
@@ -50,7 +50,7 @@ private final AlbumService albumService;
                 .message("Fetch All Album")
                 .build();
     }
-    @GetMapping("/search")
+    @GetMapping("/albums/search")
     public ApiResponse<PageResponse<AlbumResponse>> searchAlbums(@RequestParam @NotBlank String name,
                                                                    @RequestParam(defaultValue = "1") int pageNo,
                                                                    @RequestParam(defaultValue = "3") int pageSize){
@@ -60,7 +60,7 @@ private final AlbumService albumService;
                 .message("Search Album By Name With Pagination")
                 .build();
     }
-    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/album/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<AlbumResponse> update(@PathVariable long id,@Valid @ModelAttribute AlbumRequest request,
                                              @RequestParam(value = "image", required = false) MultipartFile multipartFile) throws FileException, IOException, SAXException {
         return ApiResponse.<AlbumResponse>builder()
@@ -69,7 +69,7 @@ private final AlbumService albumService;
                 .message("Update Album")
                 .build();
     }
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/album/{id}")
     private ApiResponse<Void> delete(@PathVariable long id){
         albumService.delete(id);
         return ApiResponse.<Void>builder()

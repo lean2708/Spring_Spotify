@@ -19,10 +19,10 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/v1/playlists")
+@RequestMapping("/v1")
 public class PlaylistController {
     private final PlaylistService playlistService;
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/playlist",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<PlaylistResponse> create(@Valid @ModelAttribute PlaylistRequest request,
                                                 @RequestParam(value = "image", required = false) MultipartFile multipartFile) throws FileException, IOException, SAXException {
         return ApiResponse.<PlaylistResponse>builder()
@@ -32,7 +32,7 @@ public class PlaylistController {
                 .build();
     }
 
-    @GetMapping(value = "/{id}")
+    @GetMapping(value = "/playlist/{id}")
     public ApiResponse<PlaylistResponse> fetchById(@PathVariable long id){
         return ApiResponse.<PlaylistResponse>builder()
                 .code(HttpStatus.OK.value())
@@ -40,7 +40,7 @@ public class PlaylistController {
                 .message("Fetch Playlist By Id")
                 .build();
     }
-    @GetMapping()
+    @GetMapping("/playlists")
     public ApiResponse<List<PlaylistResponse>> fetchAll(){
         return ApiResponse.<List<PlaylistResponse>>builder()
                 .code(HttpStatus.OK.value())
@@ -48,7 +48,7 @@ public class PlaylistController {
                 .message("Fetch All Playlist")
                 .build();
     }
-    @GetMapping("/search")
+    @GetMapping("/playlists/search")
     public ApiResponse<PageResponse<PlaylistResponse>> searchPlaylists(@RequestParam("title") @NotBlank String name,
                                                                  @RequestParam(defaultValue = "1") int pageNo,
                                                                  @RequestParam(defaultValue = "3") int pageSize){
@@ -58,7 +58,7 @@ public class PlaylistController {
                 .message("Search Playlists By Name With Pagination")
                 .build();
     }
-    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/playlist/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<PlaylistResponse> update(@PathVariable long id,@Valid @ModelAttribute PlaylistRequest request,
                                                 @RequestParam(value = "image", required = false) MultipartFile multipartFile) throws FileException, IOException,  SAXException {
         return ApiResponse.<PlaylistResponse>builder()
@@ -67,7 +67,7 @@ public class PlaylistController {
                 .message("Update Playlist")
                 .build();
     }
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/playlist/{id}")
     private ApiResponse<Void> delete(@PathVariable long id){
         playlistService.delete(id);
         return ApiResponse.<Void>builder()

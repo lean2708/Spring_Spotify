@@ -21,10 +21,10 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/v1/songs")
+@RequestMapping("/v1")
 public class SongController {
     private final SongService songService;
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/song",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     private ApiResponse<SongResponse> create(@Valid  @ModelAttribute SongRequest songRequest,
              @RequestParam(value = "image", required = false) MultipartFile image,
                                              @RequestParam(value = "fileSong", required = false) MultipartFile fileSong)
@@ -35,7 +35,7 @@ public class SongController {
                 .message("Create Song")
                 .build();
     }
-    @GetMapping("{id}")
+    @GetMapping("song/{id}")
     public ApiResponse<SongResponse> fetchById(@PathVariable long id){
         return ApiResponse.<SongResponse>builder()
                 .code(HttpStatus.OK.value())
@@ -43,7 +43,7 @@ public class SongController {
                 .message("Fetch Song By Id")
                 .build();
     }
-    @GetMapping()
+    @GetMapping("/songs")
     public ApiResponse<List<SongResponse>> fetchAll(){
         return ApiResponse.<List<SongResponse>>builder()
                 .code(HttpStatus.OK.value())
@@ -51,7 +51,7 @@ public class SongController {
                 .message("Fetch All Song")
                 .build();
     }
-    @GetMapping("/search")
+    @GetMapping("/songs/search")
     public ApiResponse<PageResponse<SongResponse>> searchSongs(@RequestParam @NotBlank String name,
                                                                        @RequestParam(defaultValue = "1") int pageNo,
                                                                        @RequestParam(defaultValue = "3") int pageSize){
@@ -61,7 +61,7 @@ public class SongController {
                 .message("Search Songs By Name With Pagination")
                 .build();
     }
-    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/song/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<SongResponse> update(@PathVariable long id, @Valid @ModelAttribute SongRequest request,
                                             @RequestParam(value = "image", required = false) MultipartFile image,
                                             @RequestParam(value = "fileSong", required = false) MultipartFile fileSong) throws FileException, IOException,  SAXException {
@@ -72,7 +72,7 @@ public class SongController {
                 .message("Update Song")
                 .build();
     }
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/song/{id}")
     public ApiResponse<Void> delete(@PathVariable long id){
         songService.delete(id);
         return ApiResponse.<Void>builder()

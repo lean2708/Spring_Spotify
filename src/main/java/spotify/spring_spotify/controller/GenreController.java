@@ -15,11 +15,11 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/v1/genres")
+@RequestMapping("/v1")
 public class GenreController {
     private final GenreService genreService;
 
-    @PostMapping()
+    @PostMapping("/genre")
     public ApiResponse<GenreResponse> create(@Valid @RequestBody GenreRequest request){
         return ApiResponse.<GenreResponse>builder()
                 .code(HttpStatus.CREATED.value())
@@ -28,7 +28,7 @@ public class GenreController {
                 .build();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/genre/{id}")
     public ApiResponse<GenreResponse> fetchById(@PathVariable long id){
         return ApiResponse.<GenreResponse>builder()
                 .code(HttpStatus.OK.value())
@@ -36,7 +36,7 @@ public class GenreController {
                 .message("Fetch Genre By Id")
                 .build();
     }
-    @GetMapping()
+    @GetMapping("/genres")
     public ApiResponse<List<GenreResponse>> fetchAll(){
         return ApiResponse.<List<GenreResponse>>builder()
                 .code(HttpStatus.OK.value())
@@ -44,7 +44,7 @@ public class GenreController {
                 .message("Fetch All Genre")
                 .build();
     }
-    @PutMapping("/{id}")
+    @PutMapping("/genre/{id}")
     public ApiResponse<GenreResponse> update(@PathVariable long id,@Valid @RequestBody GenreRequest request){
         return ApiResponse.<GenreResponse>builder()
                 .code(HttpStatus.OK.value())
@@ -52,7 +52,7 @@ public class GenreController {
                 .message("Update Genre")
                 .build();
     }
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/genre/{id}")
     private ApiResponse<Void> delete(@PathVariable long id){
         genreService.delete(id);
         return ApiResponse.<Void>builder()

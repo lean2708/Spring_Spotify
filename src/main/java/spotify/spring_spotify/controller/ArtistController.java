@@ -20,10 +20,10 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/v1/artists")
+@RequestMapping("/v1")
 public class ArtistController {
 private final ArtistService artistService;
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/artist",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<ArtistResponse> create(@Valid @ModelAttribute ArtistRequest request,
                                               @RequestParam(value = "image", required = false) MultipartFile multipartFile) throws FileException, IOException, SAXException {
         return ApiResponse.<ArtistResponse>builder()
@@ -33,7 +33,7 @@ private final ArtistService artistService;
                 .build();
     }
 
-    @GetMapping("{id}")
+    @GetMapping("/artist/{id}")
     public ApiResponse<ArtistResponse> fetchById(@PathVariable long id){
         return ApiResponse.<ArtistResponse>builder()
                 .code(HttpStatus.OK.value())
@@ -42,7 +42,7 @@ private final ArtistService artistService;
                 .build();
     }
 
-    @GetMapping()
+    @GetMapping("/artists")
     public ApiResponse<List<ArtistResponse>> fetchAll(){
         return ApiResponse.<List<ArtistResponse>>builder()
                 .code(HttpStatus.OK.value())
@@ -51,7 +51,7 @@ private final ArtistService artistService;
                 .build();
     }
 
-    @GetMapping("/search")
+    @GetMapping("artists/search")
     public ApiResponse<PageResponse<ArtistResponse>> searchArtists(@RequestParam @NotBlank String name,
                                                                 @RequestParam(defaultValue = "1") int pageNo,
                                                                 @RequestParam(defaultValue = "3") int pageSize){
@@ -62,7 +62,7 @@ private final ArtistService artistService;
                 .build();
     }
 
-    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/artist/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<ArtistResponse> update(@PathVariable long id,@Valid @ModelAttribute ArtistRequest request,
                                               @RequestParam(value = "image", required = false) MultipartFile multipartFile) throws FileException, IOException, SAXException {
         return ApiResponse.<ArtistResponse>builder()
@@ -71,7 +71,7 @@ private final ArtistService artistService;
                 .message("Update Artist")
                 .build();
     }
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/artist/{id}")
     private ApiResponse<Void> delete(@PathVariable long id){
         artistService.delete(id);
         return ApiResponse.<Void>builder()

@@ -14,12 +14,12 @@ import spotify.spring_spotify.service.PermissionService;
 import java.util.List;
 
 @RequiredArgsConstructor
-@RequestMapping("/v1/permissions")
+@RequestMapping("/v1")
 @RestController
 public class PermissionController {
     private final PermissionService permissionService;
 
-    @PostMapping()
+    @PostMapping("/permission")
     public ApiResponse<PermissionResponse> create(@Valid @RequestBody PermissionRequest request){
         return ApiResponse.<PermissionResponse>builder()
                 .code(HttpStatus.CREATED.value())
@@ -27,7 +27,7 @@ public class PermissionController {
                 .message("Create Permission")
                 .build();
     }
-    @GetMapping()
+    @GetMapping("/permissions")
     public ApiResponse<List<PermissionResponse>> fetchAll(){
         return ApiResponse.<List<PermissionResponse>>builder()
                 .code(HttpStatus.OK.value())
@@ -35,7 +35,7 @@ public class PermissionController {
                 .message("Fetch All Permission")
                 .build();
     }
-    @DeleteMapping("/{name}")
+    @DeleteMapping("/permission/{name}")
     public ApiResponse<Void> delete(@PathVariable String name){
         permissionService.delete(name);
         return ApiResponse.<Void>builder()
