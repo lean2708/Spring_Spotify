@@ -79,8 +79,7 @@ public class ForgotPasswordService {
         return String.format("%06d", (int) (Math.random() * 1000000));
     }
 
-//    @Scheduled(fixedRate = 3600000)
-    @PostConstruct
+    @Scheduled(fixedRate = 3600000)
     public void deleteExpiredVerificationCodes() {
         long currentTimeInMinutes = System.currentTimeMillis() / 60000; // thoi diem hien tai (phut)
 

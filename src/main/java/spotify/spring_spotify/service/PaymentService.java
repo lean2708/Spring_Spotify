@@ -152,8 +152,7 @@ public class PaymentService {
                 .build();
     }
 
-//    @Scheduled(fixedRate = 3600000)
-    @PostConstruct
+    @Scheduled(fixedRate = 3600000)
     @Async
     public void checkPremiumExpiry() {
         LocalDate currentDate = LocalDate.now();
