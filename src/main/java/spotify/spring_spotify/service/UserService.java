@@ -53,7 +53,7 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         // playlist
-        if(request.getCreatedPlaylists() != null){
+        if(request.getCreatedPlaylists() != null && !request.getCreatedPlaylists().isEmpty()){
             List<Playlist> playlistList = playlistRepository
                     .findAllByTitleIn(new ArrayList<>(request.getCreatedPlaylists()))
                     .orElseThrow(() -> new SpotifyException(ErrorCode.PLAYLIST_NOT_EXISTED));
@@ -66,13 +66,17 @@ public class UserService {
             user.setCreatedPlaylists(new HashSet<>());
         }
 
-        if(request.getRoles() != null){
+        if(request.getRoles() != null && !request.getRoles().isEmpty()){
             List<Role> roleList = roleRepository
                     .findAllByNameIn(new ArrayList<>(request.getRoles()));
             user.setRoles(new HashSet<>(roleList));
         }
         else{
-            user.setRoles(new HashSet<>());
+            Role userRole = roleRepository.findByName("USER").orElseThrow(
+                    () -> new SpotifyException(ErrorCode.ROLE_NOT_EXISTED));
+            Set<Role> roles = new HashSet<>();
+            roles.add(userRole);
+            user.setRoles(roles);
         }
 
         return convertUserResponse(userRepository.save(user));
@@ -117,7 +121,7 @@ public class UserService {
         User user = userMapper.updateUser(userDB,request);
 
         // playlist
-        if(request.getCreatedPlaylists() != null){
+        if(request.getCreatedPlaylists() != null && !request.getCreatedPlaylists().isEmpty()){
             List<Playlist> playlistList = playlistRepository
                     .findAllByTitleIn(new ArrayList<>(request.getCreatedPlaylists()))
                     .orElseThrow(() -> new SpotifyException(ErrorCode.PLAYLIST_NOT_EXISTED));
@@ -130,13 +134,10 @@ public class UserService {
             user.setCreatedPlaylists(new HashSet<>());
         }
 
-        if(request.getRoles() != null){
+        if(request.getRoles() != null && !request.getRoles().isEmpty()){
             List<Role> roleList = roleRepository
                     .findAllByNameIn(new ArrayList<>(request.getRoles()));
             user.setRoles(new HashSet<>(roleList));
-        }
-        else{
-            user.setRoles(new HashSet<>());
         }
 
         if (multipartFile != null && !multipartFile.isEmpty()) {

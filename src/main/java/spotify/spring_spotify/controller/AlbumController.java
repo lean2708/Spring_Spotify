@@ -29,6 +29,7 @@ private final AlbumService albumService;
     public ApiResponse<AlbumResponse> create(@Valid @ModelAttribute AlbumRequest request,
                                              @RequestParam(value = "image", required = false) MultipartFile multipartFile)
             throws FileException, IOException, SAXException {
+        System.out.println("Album Name: " + request.getName());
         return ApiResponse.<AlbumResponse>builder()
                 .code(HttpStatus.CREATED.value())
                 .result(albumService.create(request, multipartFile))
