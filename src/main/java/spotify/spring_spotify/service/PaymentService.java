@@ -1,0 +1,176 @@
+package spotify.spring_spotify.service;
+
+import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import spotify.spring_spotify.configuration.VNPAYConfig;
+import spotify.spring_spotify.constant.RoleEnum;
+import spotify.spring_spotify.dto.response.PremiumResponse;
+import spotify.spring_spotify.dto.response.VNPayResponse;
+import spotify.spring_spotify.entity.Role;
+import spotify.spring_spotify.entity.User;
+import spotify.spring_spotify.exception.ErrorCode;
+import spotify.spring_spotify.exception.SpotifyException;
+import spotify.spring_spotify.repository.RoleRepository;
+import spotify.spring_spotify.repository.UserRepository;
+import spotify.spring_spotify.util.VNPayUtil;
+
+import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+@RequiredArgsConstructor
+@Service
+@Slf4j
+public class PaymentService {
+
+    private final VNPAYConfig vnPayConfig;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final EmailService emailService;
+    private String type = null; // premium type
+    private String email = null;
+
+    @PreAuthorize("hasRole('USER') or hasRole('PREMIUM')")
+    public VNPayResponse createVnPayPayment(String premiumType, HttpServletRequest request) {
+        Map<String, String> vnpParamsMap = vnPayConfig.getVNPayConfig();
+
+        long amount = 100;
+
+        switch (premiumType) {
+            case "1-month":
+                amount *=  30000L;
+                break;
+            case "3-month":
+                amount *= 79000L;
+                break;
+            case "6-month":
+                amount *= 169000L;
+                break;
+            case "1-year":
+                amount *= 349000L;
+                break;
+            default:
+                throw new SpotifyException(ErrorCode.INVALID_PREMIUM_TYPE);
+        }
+        this.type = premiumType;
+
+        var context = SecurityContextHolder.getContext();
+        this.email = context.getAuthentication().getName();
+
+        vnpParamsMap.put("vnp_Amount", String.valueOf(amount));
+
+        vnpParamsMap.put("vnp_IpAddr", VNPayUtil.getIpAddress(request));
+
+        // Tao chuoi da ma hoa
+        String queryUrl = VNPayUtil.getPaymentURL(vnpParamsMap, true);
+
+        // Tao chuoi chua ma hoa
+        String hashData = VNPayUtil.getPaymentURL(vnpParamsMap, false);
+        // Thêm vnp_SecureHash vào URL
+        String vnpSecureHash = VNPayUtil.hmacSHA512(vnPayConfig.getSecretKey(), hashData);
+
+        queryUrl += "&vnp_SecureHash=" + vnpSecureHash;
+
+        // Tao URL Final
+        String paymentUrl = vnPayConfig.getVnp_PayUrl() + "?" + queryUrl;
+
+        return VNPayResponse.builder()
+                .code("ok")
+                .message("Mã thanh toán đã được tạo thành công. Bạn sẽ được chuyển đến cổng thanh toán để hoàn tất giao dịch.")
+                .paymentUrl(paymentUrl).build();
+    }
+
+    public PremiumResponse updatePremium(HttpServletRequest request){
+
+        User user = userRepository.findByEmail(this.email).orElseThrow(
+                () -> new SpotifyException(ErrorCode.USER_NOT_EXISTED));
+
+        String premiumType = this.type;
+
+        LocalDate expiryDate = user.getPremiumExpiryDate();
+
+        switch (premiumType) {
+            case "1-month":
+                expiryDate = (expiryDate != null) ? expiryDate.plusMonths(1)
+                        : LocalDate.now().plusMonths(1);
+                break;
+            case "3-month":
+                expiryDate = (expiryDate != null) ? expiryDate.plusMonths(3)
+                        : LocalDate.now().plusMonths(3);
+                break;
+            case "6-month":
+                expiryDate = (expiryDate != null) ? expiryDate.plusMonths(6)
+                        : LocalDate.now().plusMonths(6);
+                break;
+            case "1-year":
+                expiryDate = (expiryDate != null) ? expiryDate.plusYears(1)
+                        : LocalDate.now().plusYears(1);
+                break;
+            default:
+                throw new SpotifyException(ErrorCode.INVALID_PREMIUM_TYPE);
+        }
+
+        Role premiumRole = roleRepository.findByName("PREMIUM").orElseThrow(
+                () -> new SpotifyException(ErrorCode.ROLE_NOT_EXISTED));
+        Set<Role> roles = new HashSet<>();
+        roles.add(premiumRole);
+        user.setRoles(roles);
+
+        user.setPremiumStatus(true);
+        user.setPremiumExpiryDate(expiryDate);
+
+        userRepository.save(user);
+
+        emailService.sendUserEmailWithPayment(user);
+
+        return new PremiumResponse().builder()
+                .isPremiumStatus(true)
+                .expirationDate(expiryDate)
+                .build();
+    }
+
+    public PremiumResponse checkPremiumStatus(HttpServletRequest request){
+        var context = SecurityContextHolder.getContext();
+        String email = context.getAuthentication().getName();
+
+        User user = userRepository.findByEmail(email).orElseThrow(
+                () -> new SpotifyException(ErrorCode.USER_NOT_EXISTED));
+
+        boolean isPremiumStatus = user.isPremiumStatus();
+        return PremiumResponse.builder()
+                .isPremiumStatus(isPremiumStatus)
+                .expirationDate(user.getPremiumExpiryDate())
+                .build();
+    }
+
+    @Scheduled(fixedRate = 3600000)
+    @Async
+    public void checkPremiumExpiry() {
+        LocalDate currentDate = LocalDate.now();
+        List<User> listUser = userRepository.findAllByRoles_Name("PREMIUM");
+
+        for (User user : listUser) {
+            if(user.getPremiumExpiryDate() != null && user.getPremiumExpiryDate().isBefore(currentDate)){
+                user.setPremiumStatus(false);
+                user.setPremiumExpiryDate(null);
+
+                Role userRole = roleRepository.findByName("USER").orElseThrow(
+                        () -> new SpotifyException(ErrorCode.ROLE_NOT_EXISTED));
+                Set<Role> roles = new HashSet<>();
+                roles.add(userRole);
+                user.setRoles(roles);
+
+                userRepository.save(user);
+            }
+        }
+    }
+}
