@@ -8,6 +8,7 @@ Spring Spotify là một dịch vụ Restful API được phát triển bởi Sp
 - Quản lý Song : Tạo (kèm upload avatar, file song), sửa, xóa, lấy thông tin các Song
 - Tìm kiếm: Tìm kiếm theo độ ưu tiên tên artist, playlist, album, song
 - Upload / Download file lên AWS
+- Kiểm tra ứng dụng bằng UnitTest
 ## Công Nghệ Sử Dụng
 - **Công cụ build**: Maven >= 3.9.5
 - **Java**: 17
