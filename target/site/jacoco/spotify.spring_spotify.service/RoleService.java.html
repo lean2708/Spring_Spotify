@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RoleService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spring_spotify</a> &gt; <a href="index.source.html" class="el_package">spotify.spring_spotify.service</a> &gt; <span class="el_source">RoleService.java</span></div><h1>RoleService.java</h1><pre class="source lang-java linenums">package spotify.spring_spotify.service;
+
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+import spotify.spring_spotify.dto.request.RoleRequest;
+import spotify.spring_spotify.dto.response.PermissionResponse;
+import spotify.spring_spotify.dto.response.RoleResponse;
+import spotify.spring_spotify.entity.Permission;
+import spotify.spring_spotify.entity.Role;
+import spotify.spring_spotify.exception.ErrorCode;
+import spotify.spring_spotify.exception.SpotifyException;
+import spotify.spring_spotify.mapper.PermissionMapper;
+import spotify.spring_spotify.mapper.RoleMapper;
+import spotify.spring_spotify.repository.PermissionRepository;
+import spotify.spring_spotify.repository.RoleRepository;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+<span class="fc" id="L29">@Slf4j</span>
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+public class RoleService {
+    private final RoleRepository roleRepository;
+    private final PermissionRepository permissionRepository;
+    private final RoleMapper roleMapper;
+    private final PermissionMapper permissionMapper;
+
+    @PreAuthorize(&quot;hasRole('ADMIN')&quot;)
+    public RoleResponse create(RoleRequest request){
+<span class="nc bnc" id="L39" title="All 2 branches missed.">        if(roleRepository.existsByName(request.getName())){</span>
+<span class="nc" id="L40">            throw new SpotifyException(ErrorCode.ROLE_EXISTED);</span>
+        }
+<span class="nc" id="L42">        Role role = roleMapper.toRole(request);</span>
+<span class="nc" id="L43">        System.out.println(request.getPermissions());</span>
+<span class="nc bnc" id="L44" title="All 4 branches missed.">        if (request.getPermissions() != null &amp;&amp; !request.getPermissions().isEmpty()){</span>
+<span class="nc" id="L45">            List&lt;Permission&gt; permissions = permissionRepository.findAllById(request.getPermissions());</span>
+<span class="nc" id="L46">            role.setPermissions(new HashSet&lt;&gt;(permissions));</span>
+<span class="nc" id="L47">        }else {</span>
+<span class="nc" id="L48">            role.setPermissions(new HashSet&lt;&gt;());</span>
+        }
+
+<span class="nc" id="L51">        RoleResponse response = roleMapper.toRoleResponse(roleRepository.save(role));</span>
+
+<span class="nc" id="L53">        Set&lt;PermissionResponse&gt; permissionResponse = role.getPermissions().stream()</span>
+<span class="nc" id="L54">                .map(permissionMapper::toPermissionResponse).collect(Collectors.toSet());</span>
+<span class="nc" id="L55">        response.setPermissions(permissionResponse);</span>
+<span class="nc" id="L56">        return response;</span>
+    }
+    @PreAuthorize(&quot;hasRole('ADMIN')&quot;)
+    public List&lt;RoleResponse&gt; fetchAll(){
+<span class="nc" id="L60">        return roleRepository.findAll().stream().map(roleMapper::toRoleResponse).toList();</span>
+    }
+    @PreAuthorize(&quot;hasRole('ADMIN')&quot;)
+    public void delete(String name) {
+<span class="nc bnc" id="L64" title="All 2 branches missed.">        if(!roleRepository.existsByName(name)){</span>
+<span class="nc" id="L65">            throw new SpotifyException(ErrorCode.ROLE_NOT_EXISTED);</span>
+        }
+<span class="nc" id="L67">        roleRepository.deleteById(name);</span>
+<span class="nc" id="L68">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -66,7 +66,7 @@ Swagger UI sẽ hiển thị các API và cho phép thử nghiệm các chức n
 - Nhập token có được sau khi login
 - Nhấn **Authorize** để thực hiện được API yêu cầu xác thực
   
-**4. Thông tin thanh toán VNPAY (Test) :**
+**4. Mẫu thông tin thanh toán VNPAY (Test) :**
 
 | Ngân hàng             | NCB                      |
 |-----------------------|--------------------------|
@@ -74,3 +74,15 @@ Swagger UI sẽ hiển thị các API và cho phép thử nghiệm các chức n
 | Tên chủ thẻ           | NGUYEN VAN A             |
 | Ngày phát hành        | 07/15                    |
 | Mật khẩu OTP          | 123456                   |
+
+**5. Hướng Dẫn Sử Dụng JaCoCo để đo lường mức độ bao phủ mã trong khi chạy UnitTest :**
+- Mở Terminal và chạy lệnh : 
+```java
+./mvnw clean verify
+```
+- Lệnh này sẽ xóa sạch thư mục target, chạy các UnitTest và tạo báo cáo JaCoCo. Báo cáo này sẽ được lưu tại **target/site/jacoco/index.html**
+- Sau khi chạy lệnh trên, bạn có thể tìm thấy báo cáo JaCoCo tại folder trong dự án:
+```java
+target/site/jacoco/index.html
+```
+- Mở file **index.html** trong trình duyệt để xem báo cáo độ bao phủ mã chi tiết

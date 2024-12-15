@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PaymentController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spring_spotify</a> &gt; <a href="index.source.html" class="el_package">spotify.spring_spotify.controller</a> &gt; <span class="el_source">PaymentController.java</span></div><h1>PaymentController.java</h1><pre class="source lang-java linenums">package spotify.spring_spotify.controller;
+
+import io.swagger.v3.oas.annotations.Hidden;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.constraints.NotBlank;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import spotify.spring_spotify.dto.response.ApiResponse;
+import spotify.spring_spotify.dto.response.PremiumResponse;
+import spotify.spring_spotify.dto.response.SongResponse;
+import spotify.spring_spotify.dto.response.VNPayResponse;
+import spotify.spring_spotify.service.PaymentService;
+
+@RestController
+@RequestMapping(&quot;/v1/payment&quot;)
+@RequiredArgsConstructor
+<span class="fc" id="L22">@Slf4j</span>
+public class PaymentController {
+    private final PaymentService paymentService;
+    @GetMapping(&quot;/vn-pay&quot;)
+    public ApiResponse&lt;VNPayResponse&gt; pay(@RequestParam @NotBlank String premiumType, HttpServletRequest request) {
+<span class="nc" id="L27">        return new ApiResponse&lt;&gt;(HttpStatus.OK.value(), &quot;Tạo thành công URL thanh toán VNPay&quot;,</span>
+<span class="nc" id="L28">                paymentService.createVnPayPayment(premiumType, request));</span>
+    }
+
+    @Hidden
+    @GetMapping(&quot;/vn-pay-callback&quot;)
+    public ApiResponse&lt;PremiumResponse&gt; payCallbackHandler(HttpServletRequest request) {
+<span class="nc" id="L34">        String status = request.getParameter(&quot;vnp_ResponseCode&quot;);</span>
+<span class="nc bnc" id="L35" title="All 2 branches missed.">        if (status.equals(&quot;00&quot;)) {</span>
+<span class="nc" id="L36">            return new ApiResponse&lt;&gt;(1000, &quot;Thanh toán thành công&quot;,</span>
+<span class="nc" id="L37">                    paymentService.updatePremium(request));</span>
+        } else {
+<span class="nc" id="L39">            log.error(&quot;Thanh toán không thành công với mã phản hồi: &quot; + status);</span>
+<span class="nc" id="L40">            return new ApiResponse&lt;&gt;(4000, &quot;Thanh toán thất bại&quot;, null);</span>
+        }
+    }
+
+    @GetMapping(&quot;/premium-status&quot;)
+    public ApiResponse&lt;PremiumResponse&gt; checkPremiumStatus(HttpServletRequest request){
+<span class="nc" id="L46">        return ApiResponse.&lt;PremiumResponse&gt;builder()</span>
+<span class="nc" id="L47">                .code(HttpStatus.OK.value())</span>
+<span class="nc" id="L48">                .result(paymentService.checkPremiumStatus(request))</span>
+<span class="nc" id="L49">                .message(&quot;Premium Status&quot;)</span>
+<span class="nc" id="L50">                .build();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

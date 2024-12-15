@@ -1,0 +1,5 @@
+# Created at 2024-12-15T12:58:18.677
+Boot Manifest-JAR contains absolute paths in classpath 'D:\WorkSpace\Code\Spring\Spring_Spotify\target\test-classes'
+Hint: <argLine>-Djdk.net.URLClassPath.disableClassPathURLCheck=true</argLine>
+'other' has different root
+

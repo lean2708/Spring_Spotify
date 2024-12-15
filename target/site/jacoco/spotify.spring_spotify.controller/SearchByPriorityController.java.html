@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SearchByPriorityController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spring_spotify</a> &gt; <a href="index.source.html" class="el_package">spotify.spring_spotify.controller</a> &gt; <span class="el_source">SearchByPriorityController.java</span></div><h1>SearchByPriorityController.java</h1><pre class="source lang-java linenums">package spotify.spring_spotify.controller;
+
+import jakarta.validation.constraints.NotBlank;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import spotify.spring_spotify.dto.basic.PlaylistBasic;
+import spotify.spring_spotify.dto.response.ApiResponse;
+import spotify.spring_spotify.dto.response.PageResponse;
+import spotify.spring_spotify.dto.response.SearchResponse;
+import spotify.spring_spotify.service.SearchByPriorityService;
+
+import java.util.List;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping(&quot;/v1/search-by-priority&quot;)
+public class SearchByPriorityController {
+    private final SearchByPriorityService searchByPriorityService;
+    @GetMapping()
+    public ApiResponse&lt;PageResponse&lt;SearchResponse&gt;&gt; searchByPriority(@RequestParam @NotBlank String name,
+                                                                         @RequestParam int pageNo,
+                                                                         @RequestParam int pageSize) {
+<span class="nc" id="L28">        return ApiResponse.&lt;PageResponse&lt;SearchResponse&gt;&gt;builder()</span>
+<span class="nc" id="L29">                .code(HttpStatus.OK.value())</span>
+<span class="nc" id="L30">                .result(searchByPriorityService.searchAll(name, pageNo, pageSize))</span>
+<span class="nc" id="L31">                .message(&quot;Fetch Playlist Save&quot;)</span>
+<span class="nc" id="L32">                .build();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

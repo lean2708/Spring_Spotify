@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PaymentService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spring_spotify</a> &gt; <a href="index.source.html" class="el_package">spotify.spring_spotify.service</a> &gt; <span class="el_source">PaymentService.java</span></div><h1>PaymentService.java</h1><pre class="source lang-java linenums">package spotify.spring_spotify.service;
+
+import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import spotify.spring_spotify.configuration.VNPAYConfig;
+import spotify.spring_spotify.constant.RoleEnum;
+import spotify.spring_spotify.dto.response.PremiumResponse;
+import spotify.spring_spotify.dto.response.VNPayResponse;
+import spotify.spring_spotify.entity.Role;
+import spotify.spring_spotify.entity.User;
+import spotify.spring_spotify.exception.ErrorCode;
+import spotify.spring_spotify.exception.SpotifyException;
+import spotify.spring_spotify.repository.RoleRepository;
+import spotify.spring_spotify.repository.UserRepository;
+import spotify.spring_spotify.util.VNPayUtil;
+
+import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+@RequiredArgsConstructor
+@Service
+<span class="fc" id="L32">@Slf4j</span>
+public class PaymentService {
+
+    private final VNPAYConfig vnPayConfig;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final EmailService emailService;
+    private String type = null; // premium type
+    private String email = null;
+
+    @PreAuthorize(&quot;hasRole('USER') or hasRole('PREMIUM')&quot;)
+    public VNPayResponse createVnPayPayment(String premiumType, HttpServletRequest request) {
+<span class="nc" id="L44">        Map&lt;String, String&gt; vnpParamsMap = vnPayConfig.getVNPayConfig();</span>
+
+<span class="nc" id="L46">        long amount = 100;</span>
+
+<span class="nc bnc" id="L48" title="All 5 branches missed.">        switch (premiumType) {</span>
+            case &quot;1-month&quot;:
+<span class="nc" id="L50">                amount *=  30000L;</span>
+<span class="nc" id="L51">                break;</span>
+            case &quot;3-month&quot;:
+<span class="nc" id="L53">                amount *= 79000L;</span>
+<span class="nc" id="L54">                break;</span>
+            case &quot;6-month&quot;:
+<span class="nc" id="L56">                amount *= 169000L;</span>
+<span class="nc" id="L57">                break;</span>
+            case &quot;1-year&quot;:
+<span class="nc" id="L59">                amount *= 349000L;</span>
+<span class="nc" id="L60">                break;</span>
+            default:
+<span class="nc" id="L62">                throw new SpotifyException(ErrorCode.INVALID_PREMIUM_TYPE);</span>
+        }
+<span class="nc" id="L64">        this.type = premiumType;</span>
+
+<span class="nc" id="L66">        var context = SecurityContextHolder.getContext();</span>
+<span class="nc" id="L67">        this.email = context.getAuthentication().getName();</span>
+
+<span class="nc" id="L69">        vnpParamsMap.put(&quot;vnp_Amount&quot;, String.valueOf(amount));</span>
+
+<span class="nc" id="L71">        vnpParamsMap.put(&quot;vnp_IpAddr&quot;, VNPayUtil.getIpAddress(request));</span>
+
+        // Tao chuoi da ma hoa
+<span class="nc" id="L74">        String queryUrl = VNPayUtil.getPaymentURL(vnpParamsMap, true);</span>
+
+        // Tao chuoi chua ma hoa
+<span class="nc" id="L77">        String hashData = VNPayUtil.getPaymentURL(vnpParamsMap, false);</span>
+        // Thêm vnp_SecureHash vào URL
+<span class="nc" id="L79">        String vnpSecureHash = VNPayUtil.hmacSHA512(vnPayConfig.getSecretKey(), hashData);</span>
+
+<span class="nc" id="L81">        queryUrl += &quot;&amp;vnp_SecureHash=&quot; + vnpSecureHash;</span>
+
+        // Tao URL Final
+<span class="nc" id="L84">        String paymentUrl = vnPayConfig.getVnp_PayUrl() + &quot;?&quot; + queryUrl;</span>
+
+<span class="nc" id="L86">        return VNPayResponse.builder()</span>
+<span class="nc" id="L87">                .code(&quot;ok&quot;)</span>
+<span class="nc" id="L88">                .message(&quot;Mã thanh toán đã được tạo thành công. Bạn sẽ được chuyển đến cổng thanh toán để hoàn tất giao dịch.&quot;)</span>
+<span class="nc" id="L89">                .paymentUrl(paymentUrl).build();</span>
+    }
+
+    public PremiumResponse updatePremium(HttpServletRequest request){
+
+<span class="nc" id="L94">        User user = userRepository.findByEmail(this.email).orElseThrow(</span>
+<span class="nc" id="L95">                () -&gt; new SpotifyException(ErrorCode.USER_NOT_EXISTED));</span>
+
+<span class="nc" id="L97">        String premiumType = this.type;</span>
+
+<span class="nc" id="L99">        LocalDate expiryDate = user.getPremiumExpiryDate();</span>
+
+<span class="nc bnc" id="L101" title="All 5 branches missed.">        switch (premiumType) {</span>
+            case &quot;1-month&quot;:
+<span class="nc bnc" id="L103" title="All 2 branches missed.">                expiryDate = (expiryDate != null) ? expiryDate.plusMonths(1)</span>
+<span class="nc" id="L104">                        : LocalDate.now().plusMonths(1);</span>
+<span class="nc" id="L105">                break;</span>
+            case &quot;3-month&quot;:
+<span class="nc bnc" id="L107" title="All 2 branches missed.">                expiryDate = (expiryDate != null) ? expiryDate.plusMonths(3)</span>
+<span class="nc" id="L108">                        : LocalDate.now().plusMonths(3);</span>
+<span class="nc" id="L109">                break;</span>
+            case &quot;6-month&quot;:
+<span class="nc bnc" id="L111" title="All 2 branches missed.">                expiryDate = (expiryDate != null) ? expiryDate.plusMonths(6)</span>
+<span class="nc" id="L112">                        : LocalDate.now().plusMonths(6);</span>
+<span class="nc" id="L113">                break;</span>
+            case &quot;1-year&quot;:
+<span class="nc bnc" id="L115" title="All 2 branches missed.">                expiryDate = (expiryDate != null) ? expiryDate.plusYears(1)</span>
+<span class="nc" id="L116">                        : LocalDate.now().plusYears(1);</span>
+<span class="nc" id="L117">                break;</span>
+            default:
+<span class="nc" id="L119">                throw new SpotifyException(ErrorCode.INVALID_PREMIUM_TYPE);</span>
+        }
+
+<span class="nc" id="L122">        Role premiumRole = roleRepository.findByName(&quot;PREMIUM&quot;).orElseThrow(</span>
+<span class="nc" id="L123">                () -&gt; new SpotifyException(ErrorCode.ROLE_NOT_EXISTED));</span>
+<span class="nc" id="L124">        Set&lt;Role&gt; roles = new HashSet&lt;&gt;();</span>
+<span class="nc" id="L125">        roles.add(premiumRole);</span>
+<span class="nc" id="L126">        user.setRoles(roles);</span>
+
+<span class="nc" id="L128">        user.setPremiumStatus(true);</span>
+<span class="nc" id="L129">        user.setPremiumExpiryDate(expiryDate);</span>
+
+<span class="nc" id="L131">        userRepository.save(user);</span>
+
+<span class="nc" id="L133">        emailService.sendUserEmailWithPayment(user);</span>
+
+<span class="nc" id="L135">        return new PremiumResponse().builder()</span>
+<span class="nc" id="L136">                .isPremiumStatus(true)</span>
+<span class="nc" id="L137">                .expirationDate(expiryDate)</span>
+<span class="nc" id="L138">                .build();</span>
+    }
+
+    public PremiumResponse checkPremiumStatus(HttpServletRequest request){
+<span class="nc" id="L142">        var context = SecurityContextHolder.getContext();</span>
+<span class="nc" id="L143">        String email = context.getAuthentication().getName();</span>
+
+<span class="nc" id="L145">        User user = userRepository.findByEmail(email).orElseThrow(</span>
+<span class="nc" id="L146">                () -&gt; new SpotifyException(ErrorCode.USER_NOT_EXISTED));</span>
+
+<span class="nc" id="L148">        boolean isPremiumStatus = user.isPremiumStatus();</span>
+<span class="nc" id="L149">        return PremiumResponse.builder()</span>
+<span class="nc" id="L150">                .isPremiumStatus(isPremiumStatus)</span>
+<span class="nc" id="L151">                .expirationDate(user.getPremiumExpiryDate())</span>
+<span class="nc" id="L152">                .build();</span>
+    }
+
+    @Scheduled(fixedRate = 3600000)
+    @Async
+    public void checkPremiumExpiry() {
+<span class="nc" id="L158">        LocalDate currentDate = LocalDate.now();</span>
+<span class="nc" id="L159">        List&lt;User&gt; listUser = userRepository.findAllByRoles_Name(&quot;PREMIUM&quot;);</span>
+
+<span class="nc bnc" id="L161" title="All 2 branches missed.">        for (User user : listUser) {</span>
+<span class="nc bnc" id="L162" title="All 4 branches missed.">            if(user.getPremiumExpiryDate() != null &amp;&amp; user.getPremiumExpiryDate().isBefore(currentDate)){</span>
+<span class="nc" id="L163">                user.setPremiumStatus(false);</span>
+<span class="nc" id="L164">                user.setPremiumExpiryDate(null);</span>
+
+<span class="nc" id="L166">                Role userRole = roleRepository.findByName(&quot;USER&quot;).orElseThrow(</span>
+<span class="nc" id="L167">                        () -&gt; new SpotifyException(ErrorCode.ROLE_NOT_EXISTED));</span>
+<span class="nc" id="L168">                Set&lt;Role&gt; roles = new HashSet&lt;&gt;();</span>
+<span class="nc" id="L169">                roles.add(userRole);</span>
+<span class="nc" id="L170">                user.setRoles(roles);</span>
+
+<span class="nc" id="L172">                userRepository.save(user);</span>
+            }
+<span class="nc" id="L174">        }</span>
+<span class="nc" id="L175">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

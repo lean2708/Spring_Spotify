@@ -8,7 +8,7 @@ import spotify.spring_spotify.entity.Role;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2024-12-14T12:15:34+0700",
+    date = "2024-12-15T12:58:15+0700",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.12 (Oracle Corporation)"
 )
 @Component
