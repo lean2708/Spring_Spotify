@@ -9,7 +9,7 @@ import spotify.spring_spotify.entity.Album;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2024-12-15T20:38:21+0700",
+    date = "2024-12-15T22:32:37+0700",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.12 (Oracle Corporation)"
 )
 @Component

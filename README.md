@@ -77,7 +77,7 @@ Swagger UI sẽ hiển thị các API và cho phép thử nghiệm các chức n
 | Mật khẩu OTP          | 123456                   |
 
 **5. Hướng Dẫn Sử Dụng JaCoCo để đo lường mức độ bao phủ mã trong khi chạy UnitTest :**
-- Mở Terminal và chạy lệnh : 
+**- Mở Terminal và chạy lệnh :** 
 ```java
 ./mvnw test jacoco:report
 ```
