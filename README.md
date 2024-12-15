@@ -79,7 +79,7 @@ Swagger UI sẽ hiển thị các API và cho phép thử nghiệm các chức n
 **5. Hướng Dẫn Sử Dụng JaCoCo để đo lường mức độ bao phủ mã trong khi chạy UnitTest :**
 - Mở Terminal và chạy lệnh : 
 ```java
-./mvnw clean verify
+./mvnw test jacoco:report
 ```
 - Lệnh này sẽ xóa sạch thư mục target, chạy các UnitTest và tạo báo cáo JaCoCo. Báo cáo này sẽ được lưu tại **target/site/jacoco/index.html**
 - Sau khi chạy lệnh trên, bạn có thể tìm thấy báo cáo JaCoCo tại folder trong dự án:

@@ -59,33 +59,33 @@ public class AuthService {
 
 
     public UserResponse register(RegisterRequest request){
-<span class="nc bnc" id="L62" title="All 2 branches missed.">        if(userRepository.existsByEmail(request.getEmail())){</span>
-<span class="nc" id="L63">            throw new SpotifyException(ErrorCode.EMAIL_EXISTED);</span>
+<span class="fc bfc" id="L62" title="All 2 branches covered.">        if(userRepository.existsByEmail(request.getEmail())){</span>
+<span class="fc" id="L63">            throw new SpotifyException(ErrorCode.EMAIL_EXISTED);</span>
         }
 
-<span class="nc" id="L66">        User user = userMapper.toUserByRegister(request);</span>
+<span class="fc" id="L66">        User user = userMapper.toUserByRegister(request);</span>
 
-<span class="nc" id="L68">        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);</span>
-<span class="nc" id="L69">        user.setPassword(passwordEncoder.encode(user.getPassword()));</span>
+<span class="fc" id="L68">        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);</span>
+<span class="fc" id="L69">        user.setPassword(passwordEncoder.encode(user.getPassword()));</span>
 
-<span class="nc" id="L71">        Role userRole = roleRepository.findByName(&quot;USER&quot;).orElseThrow(</span>
+<span class="fc" id="L71">        Role userRole = roleRepository.findByName(&quot;USER&quot;).orElseThrow(</span>
 <span class="nc" id="L72">                () -&gt; new SpotifyException(ErrorCode.ROLE_NOT_EXISTED));</span>
-<span class="nc" id="L73">        Set&lt;Role&gt; roles = new HashSet&lt;&gt;();</span>
-<span class="nc bnc" id="L74" title="All 2 branches missed.">        if(user.getRoles() != null){</span>
+<span class="fc" id="L73">        Set&lt;Role&gt; roles = new HashSet&lt;&gt;();</span>
+<span class="pc bpc" id="L74" title="1 of 2 branches missed.">        if(user.getRoles() != null){</span>
 <span class="nc" id="L75">            roles.addAll(user.getRoles());</span>
         }
-<span class="nc" id="L77">        roles.add(userRole);</span>
-<span class="nc" id="L78">        user.setRoles(roles);</span>
+<span class="fc" id="L77">        roles.add(userRole);</span>
+<span class="fc" id="L78">        user.setRoles(roles);</span>
 
-<span class="nc" id="L80">        UserResponse response = userMapper.toUserResponse(userRepository.save(user));</span>
+<span class="fc" id="L80">        UserResponse response = userMapper.toUserResponse(userRepository.save(user));</span>
 
-<span class="nc" id="L82">        Set&lt;RoleResponse&gt; roleResponses = user.getRoles().stream()</span>
-<span class="nc" id="L83">                .map(roleMapper::toRoleResponse).collect(Collectors.toSet());</span>
-<span class="nc" id="L84">        response.setRoles(roleResponses);</span>
+<span class="fc" id="L82">        Set&lt;RoleResponse&gt; roleResponses = user.getRoles().stream()</span>
+<span class="fc" id="L83">                .map(roleMapper::toRoleResponse).collect(Collectors.toSet());</span>
+<span class="fc" id="L84">        response.setRoles(roleResponses);</span>
 
-<span class="nc" id="L86">        emailService.sendUserEmailWithRegister(user);</span>
+<span class="fc" id="L86">        emailService.sendUserEmailWithRegister(user);</span>
 
-<span class="nc" id="L88">        return response;</span>
+<span class="fc" id="L88">        return response;</span>
     }
 
     public IntrospectResponse introspect(TokenRequest request) throws JOSEException, ParseException {

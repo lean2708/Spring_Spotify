@@ -14,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
@@ -22,6 +23,7 @@ import spotify.spring_spotify.dto.request.RegisterRequest;
 import spotify.spring_spotify.dto.response.RoleResponse;
 import spotify.spring_spotify.dto.response.UserResponse;
 import spotify.spring_spotify.service.AuthService;
+import spotify.spring_spotify.service.AuthServiceTest;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -29,6 +31,7 @@ import java.util.Set;
 
 @Slf4j
 @AutoConfigureMockMvc
+@TestPropertySource("/test.properties")
 @SpringBootTest
 public class AuthControllerTest {
     @Autowired

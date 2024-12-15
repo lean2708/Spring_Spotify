@@ -1,0 +1,11 @@
+# Ignore all JAR files
+*.jar
+
+# Ignore WAR files
+*.war
+
+# Ignore target directory (Maven/Gradle build output)
+target/
+
+# Ignore build directory (for Gradle projects)
+build/

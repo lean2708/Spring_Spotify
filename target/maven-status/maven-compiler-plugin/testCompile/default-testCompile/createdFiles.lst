@@ -1,2 +1,3 @@
-spotify\spring_spotify\controller\AuthControllerTest.class
 spotify\spring_spotify\SpringSpotifyApplicationTests.class
+spotify\spring_spotify\service\AuthServiceTest.class
+spotify\spring_spotify\controller\AuthControllerTest.class

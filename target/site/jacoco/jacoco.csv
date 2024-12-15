@@ -4,7 +4,7 @@ spring_spotify,spotify.spring_spotify.service,FileService,259,4,24,0,56,1,18,1,6
 spring_spotify,spotify.spring_spotify.service,GenreService,181,0,8,0,35,0,12,0,8,0
 spring_spotify,spotify.spring_spotify.service,PaymentService,313,4,24,0,80,1,23,1,8,1
 spring_spotify,spotify.spring_spotify.service,UserService,628,0,38,0,121,0,40,0,21,0
-spring_spotify,spotify.spring_spotify.service,AuthService,435,4,24,0,105,1,26,1,14,1
+spring_spotify,spotify.spring_spotify.service,AuthService,354,85,21,3,89,17,24,3,13,2
 spring_spotify,spotify.spring_spotify.service,RoleService,101,4,8,0,19,1,7,1,3,1
 spring_spotify,spotify.spring_spotify.service,PermissionService,55,0,4,0,10,0,5,0,3,0
 spring_spotify,spotify.spring_spotify.service,PlaylistService,615,0,38,0,119,0,34,0,15,0
@@ -27,9 +27,9 @@ spring_spotify,spotify.spring_spotify.controller,PermissionController,37,0,0,0,1
 spring_spotify,spotify.spring_spotify.controller,AuthController,113,13,2,0,45,5,9,1,8,1
 spring_spotify,spotify.spring_spotify.controller,PlaylistController,112,0,0,0,40,0,8,0,8,0
 spring_spotify,spotify.spring_spotify,SpringSpotifyApplication,5,3,0,0,2,1,1,1,1,1
-spring_spotify,spotify.spring_spotify.exception,SpotifyException,8,0,0,0,3,0,1,0,1,0
+spring_spotify,spotify.spring_spotify.exception,SpotifyException,0,8,0,0,0,3,0,1,0,1
 spring_spotify,spotify.spring_spotify.exception,FileException,4,0,0,0,2,0,1,0,1,0
-spring_spotify,spotify.spring_spotify.exception,ErrorCode,336,0,0,0,38,0,1,0,1,0
+spring_spotify,spotify.spring_spotify.exception,ErrorCode,0,336,0,0,0,38,0,1,0,1
 spring_spotify,spotify.spring_spotify.exception,GlobalException,114,53,0,2,33,13,6,4,6,3
 spring_spotify,spotify.spring_spotify.specification,ArtistSpecification,55,0,0,0,8,0,4,0,4,0
 spring_spotify,spotify.spring_spotify.specification,SongSpecification.new Specification() {...},18,0,0,0,2,0,2,0,2,0
