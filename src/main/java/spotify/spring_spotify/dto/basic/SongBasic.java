@@ -24,8 +24,4 @@ public class SongBasic {
     private LocalDate createdAt;
     @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDate updatedAt;
-
-    AlbumBasic album;
-
-    Set<ArtistBasic> artists;
 }

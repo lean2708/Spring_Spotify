@@ -43,7 +43,7 @@ public class GenreController {
                                                              @RequestParam(defaultValue = "asc") String nameSortOrder){
         return ApiResponse.<PageResponse<GenreResponse>>builder()
                 .code(HttpStatus.OK.value())
-                .result(genreService.fetchAllGenre(pageNo, pageSize, nameSortOrder))
+                .result(genreService.fetchAllGenres(pageNo, pageSize, nameSortOrder))
                 .message("Fetch All Genre With Pagination")
                 .build();
     }

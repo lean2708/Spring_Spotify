@@ -22,6 +22,8 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    private final CustomJwtDecoder customJwtDecoder;
+
     private final String[] PUBLIC_ENDPOINTS = {"/spotify.png",
             "/v1/auth/login", "/v1/auth/register",
             "/v1/auth/forgot-password", "/v1/auth/verify-code", "/v1/auth/change-password",
@@ -29,7 +31,6 @@ public class SecurityConfig {
             "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html",
             "/v1/payment/vn-pay-callback"
     };
-    private final CustomJwtDecoder customJwtDecoder;
 
     public SecurityConfig(CustomJwtDecoder customJwtDecoder) {
         this.customJwtDecoder = customJwtDecoder;

@@ -46,7 +46,7 @@ public class PlaylistController {
                                                               @RequestParam(defaultValue = "asc") String titleSortOrder){
         return ApiResponse.<PageResponse<PlaylistResponse>>builder()
                 .code(HttpStatus.OK.value())
-                .result(playlistService.fetchAllPlaylist(pageNo, pageSize, titleSortOrder))
+                .result(playlistService.fetchAllPlaylists(pageNo, pageSize, titleSortOrder))
                 .message("Fetch All Playlist With Pagination")
                 .build();
     }

@@ -32,8 +32,6 @@ import java.util.stream.Collectors;
 @Service
 public class GenreService {
     private final GenreMapper genreMapper;
-    private final SongRepository songRepository;
-    private final SongMapper songMapper;
     private final GenreRepository genreRepository;
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -51,8 +49,8 @@ public class GenreService {
 
         return genreMapper.toGenreResponse(genre);
     }
-    @PreAuthorize("hasRole('ADMIN')")
-    public PageResponse<GenreResponse> fetchAllGenre(int pageNo,int pageSize, String nameSortOrder){
+
+    public PageResponse<GenreResponse> fetchAllGenres(int pageNo,int pageSize, String nameSortOrder){
         pageNo = pageNo - 1;
 
         Sort sort = (nameSortOrder.equalsIgnoreCase("asc"))
@@ -81,6 +79,7 @@ public class GenreService {
                 .build();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public GenreResponse update(long id, GenreRequest request){
         Genre genreDB = genreRepository.findById(id)
                 .orElseThrow(() -> new SpotifyException(ErrorCode.GENRE_NOT_EXISTED));
@@ -90,7 +89,6 @@ public class GenreService {
         return genreMapper.toGenreResponse(genreRepository.save(genre));
     }
     @PreAuthorize("hasRole('ADMIN')")
-
     public void delete(long id){
         Genre genreDB = genreRepository.findById(id)
                 .orElseThrow(() -> new SpotifyException(ErrorCode.GENRE_NOT_EXISTED));

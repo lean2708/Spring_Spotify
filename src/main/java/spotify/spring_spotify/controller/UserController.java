@@ -4,6 +4,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
 import spotify.spring_spotify.dto.basic.PlaylistBasic;
 import spotify.spring_spotify.dto.request.UserRequest;
+import spotify.spring_spotify.dto.request.UserUpdateRequest;
 import spotify.spring_spotify.dto.response.ApiResponse;
 import spotify.spring_spotify.dto.response.PageResponse;
 import spotify.spring_spotify.dto.response.PlaylistResponse;
@@ -48,13 +49,13 @@ public class UserController {
                                                             @RequestParam(defaultValue = "asc") String nameSortOrder){
         return ApiResponse.<PageResponse<UserResponse>>builder()
                 .code(HttpStatus.OK.value())
-                .result(userService.fetchAllUser(pageNo, pageSize, nameSortOrder))
+                .result(userService.fetchAllUsers(pageNo, pageSize, nameSortOrder))
                 .message("Fetch All User With Pagination")
                 .build();
     }
 
     @PutMapping(value = "/user/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ApiResponse<UserResponse> update(@PathVariable long id,@Valid @ModelAttribute UserRequest request,
+    public ApiResponse<UserResponse> update(@PathVariable long id,@Valid @ModelAttribute UserUpdateRequest request,
                                             @RequestParam(value = "image", required = false) MultipartFile multipartFile) throws FileException, IOException, FileException, IOException {
         return ApiResponse.<UserResponse>builder()
                 .code(HttpStatus.OK.value())
@@ -71,16 +72,16 @@ public class UserController {
                 .build();
     }
     @PostMapping("/user/saved-playlist/{id}")
-    public ApiResponse<PlaylistBasic> createSavedPlaylists(@PathVariable long id){
-        return ApiResponse.<PlaylistBasic>builder()
+    public ApiResponse<PlaylistResponse> createSavedPlaylists(@PathVariable long id){
+        return ApiResponse.<PlaylistResponse>builder()
                 .code(HttpStatus.OK.value())
                 .result(userService.createSavedPlaylists(id))
                 .message("Save Playlist With User")
                 .build();
     }
     @GetMapping("/user/saved-playlists")
-    public ApiResponse<List<PlaylistBasic>> fetchSavedPlaylists(){
-        return ApiResponse.<List<PlaylistBasic>>builder()
+    public ApiResponse<List<PlaylistResponse>> fetchSavedPlaylists(){
+        return ApiResponse.<List<PlaylistResponse>>builder()
                 .code(HttpStatus.OK.value())
                 .result(userService.fetchSavedPlaylists())
                 .message("Fetch Playlist Save with User")

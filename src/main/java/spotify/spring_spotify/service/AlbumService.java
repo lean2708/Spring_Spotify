@@ -45,6 +45,8 @@ public class AlbumService {
     private final AlbumMapper albumMapper;
     private final ArtistMapper artistMapper;
     private final FileService fileService;
+
+    @PreAuthorize("hasRole('ADMIN')")
     public AlbumResponse create(AlbumRequest request, MultipartFile multipartFile) throws FileException, IOException {
        if(albumRepository.existsByName(request.getName())){
            throw new SpotifyException(ErrorCode.ALBUM_EXISTED);
@@ -92,11 +94,11 @@ public class AlbumService {
 
         album.setFollower(album.getFollower() + 1);
 
-        return convertAlbumResponse(album);
+        return convertAlbumResponse(albumRepository.save(album));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    public PageResponse<AlbumResponse> fetchAllAlbum(int pageNo,int pageSize, String nameSortOrder){
+
+    public PageResponse<AlbumResponse> fetchAllAlbums(int pageNo,int pageSize, String nameSortOrder){
         pageNo = pageNo - 1;
 
         Sort sort = (nameSortOrder.equalsIgnoreCase("asc"))
@@ -121,6 +123,7 @@ public class AlbumService {
                 .build();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public AlbumResponse update(long id, AlbumRequest request, MultipartFile multipartFile) throws FileException, IOException, SAXException {
         Album albumDB = albumRepository.findById(id).orElseThrow(() -> new SpotifyException(ErrorCode.ALBUM_NOT_EXISTED));
         Album album = albumMapper.update(albumDB,request);
@@ -189,6 +192,7 @@ public class AlbumService {
                 .build();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public void delete(long id){
         Album albumDB = albumRepository.findById(id)
                 .orElseThrow(() -> new SpotifyException(ErrorCode.ALBUM_NOT_EXISTED));
@@ -197,29 +201,6 @@ public class AlbumService {
             songRepository.deleteAll(songSet);
         }
         albumRepository.delete(albumDB);
-    }
-
-    public AlbumResponse convertAlbumResponse(Album album) {
-        AlbumResponse response = albumMapper.toAlbumResponse(albumRepository.save(album));
-
-        Set<ArtistBasic> artistBasicList = album.getArtists()
-                .stream().map(artistMapper::toArtistBasic).collect(Collectors.toSet());
-        response.setArtists(artistBasicList);
-
-        Set<SongBasic> songBasicList = album.getSongs()
-                .stream().map(songMapper::toSongBasic).collect(Collectors.toSet());
-        response.setSongs(songBasicList);
-
-        return response;
-    }
-
-    public List<AlbumResponse> convertListAlbumResponse(List<Album> albumList){
-        List<AlbumResponse> albumResponseList = new ArrayList<>();
-        for(Album album : albumList){
-            AlbumResponse response = convertAlbumResponse(album);
-            albumResponseList.add(response);
-        }
-        return albumResponseList;
     }
 
     public void deleteSongFromAlbum(long albumId, long songId) {
@@ -239,5 +220,28 @@ public class AlbumService {
         } else {
             throw new SpotifyException(ErrorCode.SONG_NOT_IN_ALBUM);
         }
+    }
+
+    public AlbumResponse convertAlbumResponse(Album album) {
+        AlbumResponse response = albumMapper.toAlbumResponse(album);
+
+        Set<ArtistBasic> artistBasicList = album.getArtists()
+                .stream().map(artistMapper::toArtistBasic).collect(Collectors.toSet());
+        response.setArtists(artistBasicList);
+
+        Set<SongBasic> songBasicList = album.getSongs()
+                .stream().map(songMapper::toSongBasic).collect(Collectors.toSet());
+        response.setSongs(songBasicList);
+
+        return response;
+    }
+
+    public List<AlbumResponse> convertListAlbumResponse(List<Album> albumList){
+        List<AlbumResponse> albumResponseList = new ArrayList<>();
+        for(Album album : albumList){
+            AlbumResponse response = convertAlbumResponse(album);
+            albumResponseList.add(response);
+        }
+        return albumResponseList;
     }
 }

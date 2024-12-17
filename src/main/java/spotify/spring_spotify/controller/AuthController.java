@@ -23,7 +23,7 @@ public class AuthController {
     public ApiResponse<AuthResponse> authenticate(@Valid @RequestBody AuthRequest request) throws JOSEException {
         return ApiResponse.<AuthResponse>builder()
                 .code(HttpStatus.CREATED.value())
-                .result(authService.authenticated(request))
+                .result(authService.login(request))
                 .message("Token")
                 .build();
     }

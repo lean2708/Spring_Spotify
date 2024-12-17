@@ -9,7 +9,7 @@ import java.util.Set;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Data
-@Table(name = "genre")
+@Table(name = "genres")
 @Entity
 public class Genre {
     @Id

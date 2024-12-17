@@ -49,7 +49,7 @@ public class SongController {
                                                       @RequestParam(defaultValue = "asc") String nameSortOrder){
         return ApiResponse.<PageResponse<SongResponse>>builder()
                 .code(HttpStatus.OK.value())
-                .result(songService.fetchAllSong(pageNo, pageSize, nameSortOrder))
+                .result(songService.fetchAllSongs(pageNo, pageSize, nameSortOrder))
                 .message("Fetch All Song With Pagination")
                 .build();
     }

@@ -103,10 +103,10 @@ public class SongService {
 
         song.setListener(song.getListener() + 1);
 
-        return convertSongResponse(song);
+        return convertSongResponse(songRepository.save(song));
     }
 
-    public PageResponse<SongResponse> fetchAllSong( int pageNo,int pageSize, String nameSortOrder){
+    public PageResponse<SongResponse> fetchAllSongs(int pageNo,int pageSize, String nameSortOrder){
         pageNo = pageNo - 1;
 
         Sort sort = (nameSortOrder.equalsIgnoreCase("asc"))
@@ -222,27 +222,6 @@ public class SongService {
         songRepository.delete(songDB);
     }
 
-    public SongResponse convertSongResponse(Song song){
-        SongResponse response = songMapper.toSongResponse(songRepository.save(song));
-
-        response.setAlbum(Optional.ofNullable(song.getAlbum())
-                .map(albumMapper::toAlbumBasic).orElse(null));
-
-        List<ArtistBasic> artistBasicList = song.getArtists()
-                .stream().map(artistMapper::toArtistBasic).toList();
-        response.setArtists(new HashSet<>(artistBasicList));
-
-        return response;
-    }
-
-    public List<SongResponse> convertListSongResponse(List<Song> songList){
-        List<SongResponse> songResponseList = new ArrayList<>();
-        for(Song song : songList){
-            SongResponse response = convertSongResponse(song);
-            songResponseList.add(response);
-        }
-        return songResponseList;
-    }
     public PageResponse<SongResponse> fetchAllSongSortedByViewer( int pageNo, int pageSize, String viewerSortOrder) {
         pageNo = pageNo - 1;
 
@@ -278,5 +257,27 @@ public class SongService {
         }
 
         return convertListSongResponse(songList);
+    }
+
+    public SongResponse convertSongResponse(Song song){
+        SongResponse response = songMapper.toSongResponse(song);
+
+        response.setAlbum(Optional.ofNullable(song.getAlbum())
+                .map(albumMapper::toAlbumBasic).orElse(null));
+
+        List<ArtistBasic> artistBasicList = song.getArtists()
+                .stream().map(artistMapper::toArtistBasic).toList();
+        response.setArtists(new HashSet<>(artistBasicList));
+
+        return response;
+    }
+
+    public List<SongResponse> convertListSongResponse(List<Song> songList){
+        List<SongResponse> songResponseList = new ArrayList<>();
+        for(Song song : songList){
+            SongResponse response = convertSongResponse(song);
+            songResponseList.add(response);
+        }
+        return songResponseList;
     }
 }

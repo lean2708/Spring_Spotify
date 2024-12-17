@@ -11,6 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import spotify.spring_spotify.configuration.VNPAYConfig;
 import spotify.spring_spotify.constant.RoleEnum;
+import spotify.spring_spotify.dto.request.PaymentCallbackRequest;
 import spotify.spring_spotify.dto.response.PremiumResponse;
 import spotify.spring_spotify.dto.response.VNPayResponse;
 import spotify.spring_spotify.entity.Role;
@@ -36,8 +37,6 @@ public class PaymentService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final EmailService emailService;
-    private String type = null; // premium type
-    private String email = null;
 
     @PreAuthorize("hasRole('USER') or hasRole('PREMIUM')")
     public VNPayResponse createVnPayPayment(String premiumType, HttpServletRequest request) {
@@ -55,16 +54,12 @@ public class PaymentService {
             case "6-month":
                 amount *= 169000L;
                 break;
-            case "1-year":
+            case "12-month":
                 amount *= 349000L;
                 break;
             default:
                 throw new SpotifyException(ErrorCode.INVALID_PREMIUM_TYPE);
         }
-        this.type = premiumType;
-
-        var context = SecurityContextHolder.getContext();
-        this.email = context.getAuthentication().getName();
 
         vnpParamsMap.put("vnp_Amount", String.valueOf(amount));
 
@@ -89,31 +84,33 @@ public class PaymentService {
                 .paymentUrl(paymentUrl).build();
     }
 
-    public PremiumResponse updatePremium(HttpServletRequest request){
+    public PremiumResponse updatePremium(PaymentCallbackRequest request){
+        var context = SecurityContextHolder.getContext();
+        String email = context.getAuthentication().getName();
 
-        User user = userRepository.findByEmail(this.email).orElseThrow(
+        User user = userRepository.findByEmail(email).orElseThrow(
                 () -> new SpotifyException(ErrorCode.USER_NOT_EXISTED));
-
-        String premiumType = this.type;
 
         LocalDate expiryDate = user.getPremiumExpiryDate();
 
-        switch (premiumType) {
-            case "1-month":
+        long amount = request.getAmount() / 100;
+
+        switch ((int) amount) {
+            case 30000:
                 expiryDate = (expiryDate != null) ? expiryDate.plusMonths(1)
                         : LocalDate.now().plusMonths(1);
                 break;
-            case "3-month":
+            case 79000:
                 expiryDate = (expiryDate != null) ? expiryDate.plusMonths(3)
                         : LocalDate.now().plusMonths(3);
                 break;
-            case "6-month":
+            case 169000:
                 expiryDate = (expiryDate != null) ? expiryDate.plusMonths(6)
                         : LocalDate.now().plusMonths(6);
                 break;
-            case "1-year":
+            case 349000:
                 expiryDate = (expiryDate != null) ? expiryDate.plusYears(1)
-                        : LocalDate.now().plusYears(1);
+                        : LocalDate.now().plusMonths(12);
                 break;
             default:
                 throw new SpotifyException(ErrorCode.INVALID_PREMIUM_TYPE);

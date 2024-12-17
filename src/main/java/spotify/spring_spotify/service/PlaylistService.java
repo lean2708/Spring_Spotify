@@ -5,22 +5,18 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.xml.sax.SAXException;
-import spotify.spring_spotify.dto.basic.SongBasic;
 import spotify.spring_spotify.dto.request.PlaylistRequest;
-import spotify.spring_spotify.dto.response.AlbumResponse;
 import spotify.spring_spotify.dto.response.PageResponse;
 import spotify.spring_spotify.dto.response.PlaylistResponse;
-import spotify.spring_spotify.entity.Album;
+import spotify.spring_spotify.dto.response.SongResponse;
 import spotify.spring_spotify.entity.Playlist;
 import spotify.spring_spotify.entity.Song;
 import spotify.spring_spotify.exception.ErrorCode;
 import spotify.spring_spotify.exception.FileException;
 import spotify.spring_spotify.exception.SpotifyException;
 import spotify.spring_spotify.mapper.PlaylistMapper;
-import spotify.spring_spotify.mapper.SongMapper;
 import spotify.spring_spotify.repository.PlaylistRepository;
 import spotify.spring_spotify.repository.SongRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,17 +25,16 @@ import spotify.spring_spotify.specification.PlaylistSpecification;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
 public class PlaylistService {
     private final PlaylistRepository playlistRepository;
     private final SongRepository songRepository;
-    private final SongMapper songMapper;
     private final PlaylistMapper playlistMapper;
     private final FileService fileService;
     private final AuthService authService;
+    private final SongService songService;
 
     public PlaylistResponse create(PlaylistRequest request, MultipartFile multipartFile) throws FileException, IOException, SAXException {
         if(playlistRepository.existsByTitle(request.getTitle())){
@@ -80,10 +75,10 @@ public class PlaylistService {
         playlist.setFollower(playlist.getFollower() + 1);
         playlist.setListener(playlist.getListener() + 1);
 
-        return convertPlaylistResponse(playlist);
+        return convertPlaylistResponse(playlistRepository.save(playlist));
     }
 
-    public PageResponse<PlaylistResponse> fetchAllPlaylist(int pageNo,int pageSize, String titleSortOrder){
+    public PageResponse<PlaylistResponse> fetchAllPlaylists(int pageNo,int pageSize, String titleSortOrder){
         pageNo = pageNo - 1;
 
         Sort sort = (titleSortOrder.equalsIgnoreCase("asc"))
@@ -175,24 +170,6 @@ public class PlaylistService {
         playlistRepository.delete(playlistDB);
     }
 
-    public PlaylistResponse convertPlaylistResponse(Playlist playlist) {
-        PlaylistResponse response = playlistMapper.toPlaylistResponse(playlistRepository.save(playlist));
-
-        Set<SongBasic> songBasicList = playlist.getSongs()
-                .stream().map(songMapper::toSongBasic).collect(Collectors.toSet());
-        response.setSongs(songBasicList);
-
-        return response;
-    }
-
-    public List<PlaylistResponse> convertListPlaylistResponse(List<Playlist> playlistList){
-        List<PlaylistResponse> playlistResponseList = new ArrayList<>();
-        for (Playlist playlist : playlistList){
-            PlaylistResponse response = convertPlaylistResponse(playlist);
-            playlistResponseList.add(response);
-        }
-        return playlistResponseList;
-    }
     public void removeSongFromPlaylist(long playlistId, long songId) {
         Playlist playlist = playlistRepository.findById(playlistId)
                 .orElseThrow(() -> new SpotifyException(ErrorCode.PLAYLIST_NOT_EXISTED));
@@ -232,4 +209,25 @@ public class PlaylistService {
                 .build();
     }
 
+
+    public PlaylistResponse convertPlaylistResponse(Playlist playlist) {
+        PlaylistResponse response = playlistMapper.toPlaylistResponse(playlist);
+
+
+        List<Song> songList = new ArrayList<>(playlist.getSongs());
+        List<SongResponse> songResponseList = songService.convertListSongResponse(songList);
+
+        response.setSongs(new HashSet<>(songResponseList));
+
+        return response;
+    }
+
+    public List<PlaylistResponse> convertListPlaylistResponse(List<Playlist> playlistList){
+        List<PlaylistResponse> playlistResponseList = new ArrayList<>();
+        for (Playlist playlist : playlistList){
+            PlaylistResponse response = convertPlaylistResponse(playlist);
+            playlistResponseList.add(response);
+        }
+        return playlistResponseList;
+    }
 }

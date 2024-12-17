@@ -24,7 +24,7 @@ public class PlaylistResponse {
     long listener;
     double totalHours;
 
-    Set<SongBasic> songs;
+    Set<SongResponse> songs;
 
     @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDate createdAt;

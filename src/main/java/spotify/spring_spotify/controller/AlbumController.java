@@ -48,7 +48,7 @@ private final AlbumService albumService;
                                                      @RequestParam(defaultValue = "asc") String nameSortOrder){
         return ApiResponse.<PageResponse<AlbumResponse>>builder()
                 .code(HttpStatus.OK.value())
-                .result(albumService.fetchAllAlbum(pageNo, pageSize, nameSortOrder))
+                .result(albumService.fetchAllAlbums(pageNo, pageSize, nameSortOrder))
                 .message("Fetch All Album With Pagination")
                 .build();
     }

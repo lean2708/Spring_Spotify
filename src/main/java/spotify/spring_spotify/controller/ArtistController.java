@@ -48,7 +48,7 @@ private final ArtistService artistService;
                                                       @RequestParam(defaultValue = "asc") String nameSortOrder){
         return ApiResponse.<PageResponse<ArtistResponse>>builder()
                 .code(HttpStatus.OK.value())
-                .result(artistService.fetchAllAritst(pageNo, pageSize, nameSortOrder))
+                .result(artistService.fetchAllAritsts(pageNo, pageSize, nameSortOrder))
                 .message("Fetch All Artist With Pagination")
                 .build();
     }

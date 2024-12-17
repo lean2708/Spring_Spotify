@@ -58,6 +58,25 @@ public class AuthService {
     protected long tokenExpiration;
 
 
+    public AuthResponse login(AuthRequest request) throws JOSEException {
+        User userDB = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(()-> new SpotifyException(ErrorCode.USER_NOT_EXISTED));
+
+        PasswordEncoder passwordEncoder  = new BCryptPasswordEncoder(10);
+        boolean isauthenticated = passwordEncoder.matches(request.getPassword(), userDB.getPassword());
+
+        if(!isauthenticated){
+            throw new SpotifyException(ErrorCode.INVALID_PASSWORD);
+        }
+
+        String token = generateToken(userDB);
+
+        return AuthResponse.builder()
+                .token(token)
+                .authenticaed(true)
+                .build();
+    }
+
     public UserResponse register(RegisterRequest request){
         if(userRepository.existsByEmail(request.getEmail())){
             throw new SpotifyException(ErrorCode.EMAIL_EXISTED);
@@ -88,36 +107,7 @@ public class AuthService {
         return response;
     }
 
-    public IntrospectResponse introspect(TokenRequest request) throws JOSEException, ParseException {
-        String token = request.getToken();
-        boolean inValid = true;
-        try {
-            verifyToken(token);
-        } catch (SpotifyException e){
-            inValid = false;
-        }
-        return IntrospectResponse.builder()
-                .valid(inValid)
-                .build();
-    }
 
-    public AuthResponse authenticated(AuthRequest request) throws JOSEException {
-        User userDB = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(()-> new SpotifyException(ErrorCode.USER_NOT_EXISTED));
-
-        PasswordEncoder passwordEncoder  = new BCryptPasswordEncoder(10);
-        boolean isauthenticated = passwordEncoder.matches(request.getPassword(), userDB.getPassword());
-        if(!isauthenticated){
-            throw new SpotifyException(ErrorCode.INVALID_PASSWORD);
-        }
-
-        String token = generateToken(userDB);
-
-        return AuthResponse.builder()
-                .token(token)
-                .authenticaed(true)
-                .build();
-    }
     public String generateToken(User user) throws JOSEException {
         // header
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
@@ -138,6 +128,40 @@ public class AuthService {
         jwsObject.sign(new MACSigner(SINGER_KEY.getBytes()));
 
         return jwsObject.serialize();
+    }
+
+    public IntrospectResponse introspect(TokenRequest request) throws JOSEException, ParseException {
+        String token = request.getToken();
+        boolean inValid = true;
+        try {
+            verifyToken(token);
+        } catch (SpotifyException e){
+            inValid = false;
+        }
+        return IntrospectResponse.builder()
+                .valid(inValid)
+                .build();
+    }
+
+    private SignedJWT verifyToken(String token) throws JOSEException, ParseException {
+        JWSVerifier verifier = new MACVerifier(SINGER_KEY.getBytes());
+
+        SignedJWT signedJWT = SignedJWT.parse(token);
+
+        Date expityTime = signedJWT.getJWTClaimsSet().getExpirationTime();
+
+        boolean isverifed = signedJWT.verify(verifier);
+
+        String jwtId = signedJWT.getJWTClaimsSet().getJWTID();
+
+        if(!isverifed && !expityTime.after(new Date()) || jwtId == null){
+            throw new SpotifyException(ErrorCode.UNAUTHENTICATED);
+        }
+
+        if(invalidatedRepository.existsById(jwtId)){
+            throw new SpotifyException(ErrorCode.UNAUTHORIZED);
+        }
+        return signedJWT;
     }
 
     public String buildScope(User user) {
@@ -166,26 +190,7 @@ public class AuthService {
 
         invalidatedRepository.save(invalidatedToken);
     }
-    private SignedJWT verifyToken(String token) throws JOSEException, ParseException {
-        JWSVerifier verifier = new MACVerifier(SINGER_KEY.getBytes());
 
-        SignedJWT signedJWT = SignedJWT.parse(token);
-
-        Date expityTime = signedJWT.getJWTClaimsSet().getExpirationTime();
-
-        boolean isverifed = signedJWT.verify(verifier);
-
-        String jwtId = signedJWT.getJWTClaimsSet().getJWTID();
-
-        if(!isverifed && !expityTime.after(new Date()) || jwtId == null){
-            throw new SpotifyException(ErrorCode.UNAUTHENTICATED);
-        }
-
-        if(invalidatedRepository.existsById(jwtId)){
-            throw new SpotifyException(ErrorCode.UNAUTHORIZED);
-        }
-        return signedJWT;
-    }
     public UserResponse getMyInfo() {
         var context = SecurityContextHolder.getContext();
         String email = context.getAuthentication().getName();

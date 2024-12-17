@@ -1,21 +1,15 @@
 package spotify.spring_spotify.mapper;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
-import spotify.spring_spotify.dto.basic.AlbumBasic;
-import spotify.spring_spotify.dto.basic.ArtistBasic;
 import spotify.spring_spotify.dto.basic.SongBasic;
 import spotify.spring_spotify.dto.request.SongRequest;
 import spotify.spring_spotify.dto.response.SongResponse;
-import spotify.spring_spotify.entity.Album;
-import spotify.spring_spotify.entity.Artist;
 import spotify.spring_spotify.entity.Song;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2024-12-15T22:32:36+0700",
+    date = "2024-12-16T21:10:03+0700",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.12 (Oracle Corporation)"
 )
 @Component
@@ -76,8 +70,6 @@ public class SongMapperImpl implements SongMapper {
         songBasic.fileSongURL( song.getFileSongURL() );
         songBasic.createdAt( song.getCreatedAt() );
         songBasic.updatedAt( song.getUpdatedAt() );
-        songBasic.album( albumToAlbumBasic( song.getAlbum() ) );
-        songBasic.artists( artistSetToArtistBasicSet( song.getArtists() ) );
 
         return songBasic.build();
     }
@@ -94,49 +86,5 @@ public class SongMapperImpl implements SongMapper {
         song.setListener( request.getListener() );
 
         return song;
-    }
-
-    protected AlbumBasic albumToAlbumBasic(Album album) {
-        if ( album == null ) {
-            return null;
-        }
-
-        AlbumBasic.AlbumBasicBuilder albumBasic = AlbumBasic.builder();
-
-        albumBasic.id( album.getId() );
-        albumBasic.name( album.getName() );
-        albumBasic.description( album.getDescription() );
-        albumBasic.totalTracks( album.getTotalTracks() );
-        albumBasic.follower( album.getFollower() );
-        albumBasic.totalHours( album.getTotalHours() );
-
-        return albumBasic.build();
-    }
-
-    protected ArtistBasic artistToArtistBasic(Artist artist) {
-        if ( artist == null ) {
-            return null;
-        }
-
-        ArtistBasic.ArtistBasicBuilder artistBasic = ArtistBasic.builder();
-
-        artistBasic.id( artist.getId() );
-        artistBasic.name( artist.getName() );
-        artistBasic.follower( artist.getFollower() );
-
-        return artistBasic.build();
-    }
-
-    protected Set<ArtistBasic> artistSetToArtistBasicSet(Set<Artist> set) {
-        if ( set == null ) {
-            return null;
-        }
-
-        Set<ArtistBasic> set1 = new LinkedHashSet<ArtistBasic>( Math.max( (int) ( set.size() / .75f ) + 1, 16 ) );
-        for ( Artist artist : set ) {
-            set1.add( artistToArtistBasic( artist ) );
-        }
-
-        return set1;
     }
 }

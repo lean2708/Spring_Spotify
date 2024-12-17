@@ -86,18 +86,17 @@ public class ArtistService {
 
        return convertArtistToResponse(artistRepository.save(artist));
     }
-    @PreAuthorize("hasRole('ADMIN')")
     public ArtistResponse fetchById(long id){
         Artist artist = artistRepository.findById(id)
                 .orElseThrow(() -> new SpotifyException(ErrorCode.ARTIST_NOT_EXISTED));
 
         artist.setFollower(artist.getFollower() + 1);
 
-        return convertArtistToResponse(artist);
+        return convertArtistToResponse(artistRepository.save(artist));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    public PageResponse<ArtistResponse> fetchAllAritst(int pageNo,int pageSize, String nameSortOrder){
+
+    public PageResponse<ArtistResponse> fetchAllAritsts(int pageNo,int pageSize, String nameSortOrder){
         pageNo = pageNo - 1;
 
         Sort sort = (nameSortOrder.equalsIgnoreCase("asc"))
@@ -131,7 +130,6 @@ public class ArtistService {
                 .and(ArtistSpecification.sortByNamePriority(name));
 
         Page<Artist> artistPage = artistRepository.findAll(spec, pageable);
-
         if (artistPage.isEmpty()) {
             throw new SpotifyException(ErrorCode.ARTIST_NOT_EXISTED);
         }
@@ -214,7 +212,7 @@ public class ArtistService {
 
 
     public ArtistResponse convertArtistToResponse(Artist artist) {
-        ArtistResponse response = artistMapper.toArtistResponse(artistRepository.save(artist));
+        ArtistResponse response = artistMapper.toArtistResponse(artist);
 
         Set<AlbumBasic> albumBasicList = artist.getAlbums()
                 .stream().map(albumMapper::toAlbumBasic).collect(Collectors.toSet());

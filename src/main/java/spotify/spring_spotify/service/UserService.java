@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import spotify.spring_spotify.dto.basic.PlaylistBasic;
 import spotify.spring_spotify.dto.basic.SongBasic;
 import spotify.spring_spotify.dto.request.UserRequest;
+import spotify.spring_spotify.dto.request.UserUpdateRequest;
 import spotify.spring_spotify.dto.response.*;
 import spotify.spring_spotify.entity.Album;
 import spotify.spring_spotify.entity.Playlist;
@@ -43,6 +44,7 @@ public class UserService {
     private final RoleRepository roleRepository;
     private final RoleMapper roleMapper;
     private final FileService fileService;
+    private final PlaylistService playlistService;
 
     @PreAuthorize("hasRole('ADMIN')")
     public UserResponse create(UserRequest request){
@@ -92,7 +94,7 @@ public class UserService {
         return convertUserResponse(userDB);
     }
     @PreAuthorize("hasRole('ADMIN')")
-    public PageResponse<UserResponse> fetchAllUser(int pageNo,int pageSize, String nameSortOrder){
+    public PageResponse<UserResponse> fetchAllUsers(int pageNo,int pageSize, String nameSortOrder){
             pageNo = pageNo - 1;
 
             Sort sort = (nameSortOrder.equalsIgnoreCase("asc"))
@@ -117,33 +119,27 @@ public class UserService {
                     .build();
     }
 
-    public List<PlaylistBasic> fetchSavedPlaylists(){
-        var context = SecurityContextHolder.getContext();
-        String email = context.getAuthentication().getName();
-
-        User user = userRepository.findByEmail(email).orElseThrow(
-                () -> new SpotifyException(ErrorCode.USER_NOT_EXISTED));
-
-        List<Playlist> savedList = playlistRepository.findAllByIdIn(user.getSavedPlaylistId())
-                .orElseThrow(() -> new SpotifyException(ErrorCode.PLAYLIST_NOT_EXISTED));
-
-        List<PlaylistBasic> playlistBasics = new ArrayList<>();
-        for(Playlist playlist : savedList){
-            PlaylistBasic basic = playlistMapper.toPlaylistBasic(playlist);
-            playlistBasics.add(basic);
+    public User convertUpdateUser(User userDB, UserUpdateRequest request){
+        if (request == null) {
+            return userDB;
         }
-        return playlistBasics;
+        if (request.getName() != null && !request.getName().isEmpty()) {
+            userDB.setName(request.getName());
+        }
+        if (request.getPassword() != null && !request.getPassword().isEmpty()) {
+            userDB.setPassword(request.getPassword());
+        }
+        if (request.getDob() != null) {
+            userDB.setDob(request.getDob());
+        }
+        return userDB;
     }
 
-    public UserResponse update(long id, UserRequest request, MultipartFile multipartFile) throws FileException, IOException {
+    public UserResponse update(long id, UserUpdateRequest request, MultipartFile multipartFile) throws FileException, IOException {
         User userDB = userRepository.findById(id).
                 orElseThrow(() -> new SpotifyException(ErrorCode.USER_NOT_EXISTED));
 
-        if (userDB.getEmail() != null && !userDB.getEmail().equals(request.getEmail())) {
-            throw new SpotifyException(ErrorCode.EMAIL_IMMUTABLE);
-        }
-        User user = userMapper.updateUser(userDB,request);
-
+        User user = convertUpdateUser(userDB, request);
         // playlist
         if(request.getCreatedPlaylists() != null){
             List<Playlist> playlistList = playlistRepository
@@ -153,7 +149,9 @@ public class UserService {
                 playlist.setListener(playlist.getListener() + 1);
                 playlist.setCreator(user.getName());
             }
-            user.setCreatedPlaylists(new HashSet<>(playlistList));
+            Set<Playlist> playlistSet = userDB.getCreatedPlaylists();
+            playlistSet.addAll(playlistList);
+            user.setCreatedPlaylists(playlistSet);
         }
         else{
             user.setCreatedPlaylists(new HashSet<>());
@@ -164,7 +162,6 @@ public class UserService {
                     .findAllByNameIn(new ArrayList<>(request.getRoles()));
             user.setRoles(new HashSet<>(roleList));
         }
-
 
         if (multipartFile != null && !multipartFile.isEmpty()) {
             List<String> allowedFileExtensions = new ArrayList<>
@@ -182,7 +179,7 @@ public class UserService {
         userRepository.delete(userDB);
     }
 
-    public PlaylistBasic createSavedPlaylists(long id) {
+    public PlaylistResponse createSavedPlaylists(long id) {
         Playlist playlist = playlistRepository.findById(id)
                 .orElseThrow(() -> new SpotifyException(ErrorCode.PLAYLIST_NOT_EXISTED));
 
@@ -198,7 +195,21 @@ public class UserService {
 
         userRepository.save(user);
 
-        return playlistMapper.toPlaylistBasic(playlist);
+        return playlistService.convertPlaylistResponse(playlist);
+    }
+
+    public List<PlaylistResponse> fetchSavedPlaylists(){
+        var context = SecurityContextHolder.getContext();
+        String email = context.getAuthentication().getName();
+
+        User user = userRepository.findByEmail(email).orElseThrow(
+                () -> new SpotifyException(ErrorCode.USER_NOT_EXISTED));
+
+        List<Playlist> savedList = playlistRepository.findAllByIdIn(user.getSavedPlaylistId())
+                .orElseThrow(() -> new SpotifyException(ErrorCode.PLAYLIST_NOT_EXISTED));
+
+
+        return playlistService.convertListPlaylistResponse(savedList);
     }
 
     public UserResponse convertUserResponse(User user){

@@ -6,10 +6,8 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import spotify.spring_spotify.dto.request.PaymentCallbackRequest;
 import spotify.spring_spotify.dto.response.ApiResponse;
 import spotify.spring_spotify.dto.response.PremiumResponse;
 import spotify.spring_spotify.dto.response.SongResponse;
@@ -24,16 +22,17 @@ public class PaymentController {
     private final PaymentService paymentService;
     @GetMapping("/vn-pay")
     public ApiResponse<VNPayResponse> pay(@RequestParam @NotBlank String premiumType, HttpServletRequest request) {
-        return new ApiResponse<>(HttpStatus.OK.value(), "Tạo thành công URL thanh toán VNPay",
+        return new ApiResponse<>(HttpStatus.OK.value(),
+                "Tạo thành công URL thanh toán VNPay",
                 paymentService.createVnPayPayment(premiumType, request));
     }
 
-    @Hidden
-    @GetMapping("/vn-pay-callback")
-    public ApiResponse<PremiumResponse> payCallbackHandler(HttpServletRequest request) {
-        String status = request.getParameter("vnp_ResponseCode");
+    @PostMapping("/vn-pay-callback")
+    public ApiResponse<PremiumResponse> payCallbackHandler(@RequestBody PaymentCallbackRequest request) {
+        String status = request.getResponseCode();
         if (status.equals("00")) {
-            return new ApiResponse<>(1000, "Thanh toán thành công",
+            return new ApiResponse<>(1000,
+                    "Thanh toán thành công",
                     paymentService.updatePremium(request));
         } else {
             log.error("Thanh toán không thành công với mã phản hồi: " + status);
