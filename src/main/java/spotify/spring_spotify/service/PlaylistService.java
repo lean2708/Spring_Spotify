@@ -5,6 +5,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.multipart.MultipartFile;
 import org.xml.sax.SAXException;
 import spotify.spring_spotify.dto.request.PlaylistRequest;
@@ -13,6 +14,7 @@ import spotify.spring_spotify.dto.response.PlaylistResponse;
 import spotify.spring_spotify.dto.response.SongResponse;
 import spotify.spring_spotify.entity.Playlist;
 import spotify.spring_spotify.entity.Song;
+import spotify.spring_spotify.entity.User;
 import spotify.spring_spotify.exception.ErrorCode;
 import spotify.spring_spotify.exception.FileException;
 import spotify.spring_spotify.exception.SpotifyException;
@@ -21,6 +23,7 @@ import spotify.spring_spotify.repository.PlaylistRepository;
 import spotify.spring_spotify.repository.SongRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import spotify.spring_spotify.repository.UserRepository;
 import spotify.spring_spotify.specification.PlaylistSpecification;
 
 import java.io.IOException;
@@ -33,8 +36,8 @@ public class PlaylistService {
     private final SongRepository songRepository;
     private final PlaylistMapper playlistMapper;
     private final FileService fileService;
-    private final AuthService authService;
     private final SongService songService;
+    private final UserRepository userRepository;
 
     public PlaylistResponse create(PlaylistRequest request, MultipartFile multipartFile) throws FileException, IOException, SAXException {
         if(playlistRepository.existsByTitle(request.getTitle())){
@@ -56,7 +59,17 @@ public class PlaylistService {
         }
 
         playlist.setFollower(playlist.getFollower() + 1);
-        playlist.setCreator(authService.getMyInfo().getName());
+
+        var context = SecurityContextHolder.getContext();
+        String email = context.getAuthentication().getName();
+        User user = userRepository.findByEmail(email).orElseThrow(
+                () -> new SpotifyException(ErrorCode.USER_NOT_EXISTED));
+
+        playlist.setCreator(user.getName());
+
+        Set<Playlist> playlistSet = Set.of(playlist);
+        user.setCreatedPlaylists(playlistSet);
+        userRepository.save(user);
 
         // Image
         if (multipartFile != null && !multipartFile.isEmpty()) {
@@ -152,7 +165,17 @@ public class PlaylistService {
         }
 
         playlist.setFollower(playlist.getFollower() + 1);
-        playlist.setCreator(authService.getMyInfo().getName());
+
+        var context = SecurityContextHolder.getContext();
+        String email = context.getAuthentication().getName();
+        User user = userRepository.findByEmail(email).orElseThrow(
+                () -> new SpotifyException(ErrorCode.USER_NOT_EXISTED));
+
+        playlist.setCreator(user.getName());
+
+        Set<Playlist> playlistSet = Set.of(playlist);
+        user.setCreatedPlaylists(playlistSet);
+        userRepository.save(user);
 
         // Image
         if (multipartFile != null && !multipartFile.isEmpty()) {

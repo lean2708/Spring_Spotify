@@ -215,9 +215,10 @@ public class UserService {
     public UserResponse convertUserResponse(User user){
         UserResponse response = userMapper.toUserResponse(user);
 
-        Set<PlaylistBasic> playlistBasicSet = user.getCreatedPlaylists()
-                .stream().map(playlistMapper::toPlaylistBasic).collect(Collectors.toSet());
-        response.setCreatedPlaylists(playlistBasicSet);
+        if(user.getCreatedPlaylists() != null){
+            List<PlaylistResponse> playlistBasicSet = playlistService.convertListPlaylistResponse(new ArrayList<>(user.getCreatedPlaylists()));
+            response.setCreatedPlaylists(new HashSet<>(playlistBasicSet));
+        }
 
         Set<RoleResponse> roleResponses = user.getRoles().stream()
                 .map(roleMapper::toRoleResponse).collect(Collectors.toSet());

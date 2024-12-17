@@ -38,9 +38,6 @@ public class EmailService {
             helper.setSubject(subject);
             helper.setText(htmlContent, true);
 
-            FileSystemResource res = new FileSystemResource("src/main/resources/static/spotify.png");
-            helper.addInline("spotifyLogo", res);
-
             javaMailSender.send(message);
         }
         catch (MessagingException e) {

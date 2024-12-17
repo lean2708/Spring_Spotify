@@ -22,7 +22,7 @@ public class UserResponse {
      String imageURL;
      @JsonFormat(pattern = "dd/MM/yyyy")
      LocalDate dob;
-     Set<PlaylistBasic> createdPlaylists;
+     Set<PlaylistResponse> createdPlaylists;
      @JsonInclude(JsonInclude.Include.NON_NULL)
      List<Long> savedPlaylistId;
 

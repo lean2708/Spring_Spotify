@@ -51,6 +51,7 @@ public class AuthService {
     private final ArtistRepository artistRepository;
     private final PlaylistRepository playlistRepository;
     private final SongRepository songRepository;
+    private final UserService userService;
 
     @Value("${jwt.signerKey}")
     protected String SINGER_KEY;
@@ -198,17 +199,7 @@ public class AuthService {
         User user = userRepository.findByEmail(email).orElseThrow(
                 () -> new SpotifyException(ErrorCode.USER_NOT_EXISTED));
 
-        UserResponse response = userMapper.toUserResponse(userRepository.save(user));
-        if(user.getCreatedPlaylists() != null){
-            Set<PlaylistBasic> playlistBasicSet = user.getCreatedPlaylists()
-                    .stream().map(playlistMapper::toPlaylistBasic).collect(Collectors.toSet());
-            response.setCreatedPlaylists(playlistBasicSet);
-        }
-        if(user.getRoles() != null && !user.getRoles().isEmpty()){
-            Set<RoleResponse> roleResponses = user.getRoles().stream()
-                    .map(roleMapper::toRoleResponse).collect(Collectors.toSet());
-            response.setRoles(roleResponses);
-        }
+        UserResponse response = userService.convertUserResponse(user);
         return response;
     }
 

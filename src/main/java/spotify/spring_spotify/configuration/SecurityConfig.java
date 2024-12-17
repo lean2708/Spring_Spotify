@@ -24,7 +24,7 @@ public class SecurityConfig {
 
     private final CustomJwtDecoder customJwtDecoder;
 
-    private final String[] PUBLIC_ENDPOINTS = {"/spotify.png",
+    private final String[] PUBLIC_ENDPOINTS = {
             "/v1/auth/login", "/v1/auth/register",
             "/v1/auth/forgot-password", "/v1/auth/verify-code", "/v1/auth/change-password",
             "/v1/auth/introspect", "/v1/auth/logout",
@@ -44,7 +44,6 @@ public class SecurityConfig {
 
         httpSecurity.authorizeHttpRequests(request->
                 request.requestMatchers(PUBLIC_ENDPOINTS).permitAll()
-                        .requestMatchers("/spotify/static/**").permitAll()
                         .anyRequest().authenticated()
         );
 
