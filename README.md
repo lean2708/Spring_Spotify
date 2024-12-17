@@ -1,4 +1,4 @@
-# Sring My Music
+# Spring My Music
 Spring My Music là một dịch vụ Restful API được phát triển bởi Spring Boot, nhằm cung cấp các chức năng quản lý và phát nhạc tương tự như Spotify.
 ## Tính Năng
 - Quản lý người dùng: Đăng ký (thành công thông báo qua gmail), đăng nhập, quên mật khẩu(xác thực bằng mã xác nhận qua gmail), quản lý tài khoản, đăng kí Premium với tích hợp VNPAY(thông báo qua mail)
